@@ -14,6 +14,7 @@
     .container {
       display: flex;
       flex-wrap: wrap;
+      margin-top:20px;
     }
     .tool-type {
       max-width: 450px;
@@ -65,7 +66,8 @@
     p {
       margin: 0;
     }
-    .red {
+    .red,
+    #server-error {
       color: red;
     }
     #manual-prices,
@@ -80,6 +82,7 @@
   <h1>Калькулятор окупаемости инструментов</h1>
 
   <button id="fetch-prices-btn" onclick="fetchPrices()">Обновить цены с сервера</button>
+  <div id="server-error"></div>
   <div id="server-prices"></div>
   <button id="manual-prices-btn" onclick="toggleManualPrices()">Ввести цены вручную</button>
 
@@ -96,6 +99,8 @@
   <div class="container" id="result"></div>
   
   <script>
+    const precision = 3;
+
     function calculateROI() {
       const woodPrice = parseFloat(document.getElementById('woodPrice').value);
       const foodPrice = parseFloat(document.getElementById('foodPrice').value);
@@ -136,7 +141,6 @@
           const netProfitPerDay = netProfitPerHour * 24;
           const roiHours = craftCost / netProfitPerHour;
           const roiDays = roiHours / 24;
-          const precision = 3;
           
           toolsHTML += `
             <div class="tool-box">
@@ -169,17 +173,21 @@
       document.getElementById('result').innerHTML = resultHTML;
     }
     
-    let priceInterval;
+    let priceTimeout;
 
     function fetchPrices() {
       const fetchPricesBtn = document.getElementById('fetch-prices-btn');
       const serverPrices = document.getElementById('server-prices');
       const calculatePricesBtn = document.getElementById('calculate-prices-btn');
+      const manualPrices = document.getElementById('manual-prices');
       const manualPricesBtn = document.getElementById('manual-prices-btn');
-
+      const serverError = document.getElementById('server-error');
+      
+      serverError.innerHTML = '';
       manualPricesBtn.style.display = 'inline-block';
+      manualPrices.style.display = 'none';
       fetchPricesBtn.style.display = 'none';
-      serverPrices.style.display = 'none';
+      serverPrices.style.display = 'block';
       calculatePricesBtn.style.display = 'none';
 
       fetch('https://app.farm-world.space/tokens.php')
@@ -191,31 +199,38 @@
           calculateROI();
 
           const date = new Date(data.date_update * 1000);
-          serverPrices.innerHTML = `Загруженные цены на ${date.toLocaleString()}: <br>Дерево: ${data.WOOD}, Еда: ${data.FOOD}, Золото: ${data.GOLD}`;
-          serverPrices.style.display = 'block';
+          serverPrices.innerHTML = `<div>Загруженные цены на <b>${date.toLocaleString('ru-RU')}</b>:</div> 
+          <div><img class="resource-icon" src="img/wood_shadow.png">Дерево: <b>${Number(data.WOOD).toFixed(precision)}</b><i class="ton-icon"></i></div>
+          <div><img class="resource-icon" src="img/food_shadow.png">Еда: <b>${Number(data.FOOD).toFixed(precision)}</b><i class="ton-icon"></i></div>
+          <div><img class="resource-icon" src="img/gold_shadow.png">Золото: <b>${Number(data.GOLD).toFixed(precision)}</b><i class="ton-icon"></i></div>`;
+          priceTimeout = setTimeout(fetchPrices, 5000);
         })
         .catch(error => {
-          console.error('Ошибка получения цен:', error);
+          const serverError = document.getElementById('server-error');
+          serverError.innerHTML = `Ошибка получения цен: ${error}`;
           toggleManualPrices();
           calculateROI();
+          const serverPrices = document.getElementById('server-prices');
+          serverPrices.style.display = 'none';
         });
     }
 
     function toggleManualPrices() {
       const manualPrices = document.getElementById('manual-prices');
-      manualPrices.style.display = 'block';
       const fetchPricesBtn = document.getElementById('fetch-prices-btn');
-      fetchPricesBtn.style.display = 'none';
       const serverPrices = document.getElementById('server-prices');
-      serverPrices.style.display = 'none';
       const calculatePricesBtn = document.getElementById('calculate-prices-btn');
-      calculatePricesBtn.style.display = 'inline-block';
       const manualPricesBtn = document.getElementById('manual-prices-btn');
+
+      manualPrices.style.display = 'block';
+      fetchPricesBtn.style.display = 'inline-block';
+      serverPrices.style.display = 'none';
+      calculatePricesBtn.style.display = 'inline-block';
       manualPricesBtn.style.display = 'none';
-      clearInterval(priceInterval);
+
+      clearTimeout(priceTimeout);
     }
     fetchPrices();
-    priceInterval = setInterval(fetchPrices, 5000);
 
   </script>
 </body>
