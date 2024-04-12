@@ -118,10 +118,10 @@
           const resourcePrice = tool.resource === 'Wood' ? woodPrice : (tool.resource === 'Food' ? foodPrice : goldPrice);
           const energyCost = tool.energy / 5 * foodPrice;
           const durabilityCost = tool.durability / 5 * goldPrice;
-          const totalCost = craftCost + energyCost + durabilityCost;
-          const profitPerHour = tool.profit * resourcePrice / tool.cooldown;
-          const profitPerDay = profitPerHour * 24;
-          const roiHours = totalCost / profitPerHour;
+          const grossProfitPerHour = tool.profit * resourcePrice;
+          const netProfitPerHour = (grossProfitPerHour - energyCost - durabilityCost) / tool.cooldown;
+          const netProfitPerDay = netProfitPerHour * 24;
+          const roiHours = craftCost / netProfitPerHour;
           const roiDays = roiHours / 24;
           const precision = 3;
           
@@ -134,13 +134,12 @@
                   <img class="resource-icon" src="img/${tool.resource.toLowerCase()}_shadow.png" alt="${tool.resource}">
                   Добывает: ${tool.resource}
                 </div>
-                <p>Стоимость крафта: <b>${craftCost.toFixed(precision)}</b><i class="ton-icon"></i></p>
+                <p></span>Стоимость крафта: <b>${craftCost.toFixed(precision)}</b><i class="ton-icon"></i></p>
                 ${tool.energy > 0 ? `<p>Потребление энергии(5 = 1 еда): ${tool.energy} (<b>${energyCost.toFixed(precision)}</b><i class="ton-icon"></i>)</p>` : ''}
                 <p>Потеря прочности(5 = 1 золото): ${tool.durability} (<b>${durabilityCost.toFixed(precision)}</b><i class="ton-icon"></i>)</p>
-                <p>Общая стоимость: <b>${totalCost.toFixed(precision)}</b><i class="ton-icon"></i></p>
-                <p>Прибыль в час: <b>${profitPerHour.toFixed(precision)}</b><i class="ton-icon"></i></p>
-                <p>Прибыль в сутки: <b>${profitPerDay.toFixed(precision)}</b><i class="ton-icon"></i></p>
-                <p>Срок окупаемости: <b>${roiHours.toFixed(precision)}</b> часов (<b>${roiDays.toFixed(precision)}</b> дней)</p>
+                <p></span>Прибыль в час: <b>${netProfitPerHour.toFixed(precision)}</b><i class="ton-icon"></i></p>
+                <p></span>Прибыль в сутки: <b>${netProfitPerDay.toFixed(precision)}</b><i class="ton-icon"></i></p>
+                <p>Срок окупаемости: ${roiHours > 0 ? `<b>${roiHours.toFixed(1)}</b> часов (<b>${roiDays.toFixed(1)}</b> дней)` : '<b>Никогда</b>' }</p>
               </div>
             </div>
           `;
