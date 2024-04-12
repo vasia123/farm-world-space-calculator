@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Калькулятор окупаемости инструментов</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    input {
+      margin-bottom: 10px;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .tool-type {
+      max-width: 450px;
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+    .tool-type h2 {
+      margin-top: 0;
+    }
+    .tool-box {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+      display: flex;
+    }
+    .tool-icon {
+      width: 64px;
+      height: 64px;
+      margin-right: 10px;
+    }
+    .tool-info {
+      flex-grow: 1;
+    }
+    .tool-name {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .tool-resource {
+      display: flex;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .resource-icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Калькулятор окупаемости инструментов</h1>
+  
+  <label for="woodPrice">Цена за единицу дерева:</label>
+  <input type="number" id="woodPrice" step="0.01" value="0.0089"><br>
+  
+  <label for="foodPrice">Цена за единицу еды:</label>
+  <input type="number" id="foodPrice" step="0.01" value="0.0079"><br>
+  
+  <label for="goldPrice">Цена за единицу золота:</label>
+  <input type="number" id="goldPrice" step="0.01" value="0.01"><br>
+  
+  <button onclick="calculateROI()">Рассчитать окупаемость</button>
+  
+  <div class="container" id="result"></div>
+  
+  <script>
+    function calculateROI() {
+      const woodPrice = parseFloat(document.getElementById('woodPrice').value);
+      const foodPrice = parseFloat(document.getElementById('foodPrice').value);
+      const goldPrice = parseFloat(document.getElementById('goldPrice').value);
+      
+      const tools = [
+        { name: 'Axe (Common)', icon: 'img/axe_common_shadow.png', profit: 5, wood: 2400, gold: 400, cooldown: 1, resource: 'Wood', energy: 10, durability: 5, maxDurability: 100 },
+        { name: 'Axe (Uncommon)', icon: 'img/axe_uncommon_shadow.png', profit: 17, wood: 7200, gold: 1200, cooldown: 1, resource: 'Wood', energy: 30, durability: 15, maxDurability: 300 },
+        { name: 'Axe (Rare)', icon: 'img/axe_rare_shadow.png', profit: 54, wood: 21600, gold: 3600, cooldown: 1, resource: 'Wood', energy: 60, durability: 45, maxDurability: 900 },
+        { name: 'Axe (Promo)', icon: 'img/axe_promo_shadow.png', profit: 0.7, wood: 110, gold: 20, cooldown: 2, resource: 'Wood', energy: 4, durability: 1, maxDurability: 25 },
+        { name: 'Bow (Common)', icon: 'img/bow_common_shadow.png', profit: 5, wood: 1200, gold: 200, cooldown: 1, resource: 'Food', energy: 0, durability: 5, maxDurability: 250 },
+        { name: 'Bow (Uncommon)', icon: 'img/bow_uncommon_shadow.png', profit: 20, wood: 4800, gold: 800, cooldown: 1, resource: 'Food', energy: 0, durability: 20, maxDurability: 1000 },
+        { name: 'Bow (Rare)', icon: 'img/bow_rare_shadow.png', profit: 80, wood: 19200, gold: 3200, cooldown: 1, resource: 'Food', energy: 0, durability: 32, maxDurability: 1600 },
+        { name: 'Pickaxe (Common)', icon: 'img/pikaxe_common_shadow.png', profit: 50, wood: 24000, gold: 4000, cooldown: 1, resource: 'Gold', energy: 66, durability: 3, maxDurability: 250 }
+      ];
+      
+      const toolTypes = {};
+      
+      for (const tool of tools) {
+        if (!toolTypes[tool.resource]) {
+          toolTypes[tool.resource] = [];
+        }
+        toolTypes[tool.resource].push(tool);
+      }
+      
+      let resultHTML = '';
+      
+      for (const [resource, toolsOfType] of Object.entries(toolTypes)) {
+        let toolsHTML = '';
+        
+        for (const tool of toolsOfType) {
+          const craftCost = tool.wood * woodPrice + tool.gold * goldPrice;
+          const resourcePrice = tool.resource === 'Wood' ? woodPrice : (tool.resource === 'Food' ? foodPrice : goldPrice);
+          const energyCost = tool.energy / 5 * foodPrice;
+          const durabilityCost = tool.durability / 5 * goldPrice;
+          const totalCost = craftCost + energyCost + durabilityCost;
+          const profitPerHour = tool.profit * resourcePrice / tool.cooldown;
+          const profitPerDay = profitPerHour * 24;
+          const roiHours = totalCost / profitPerHour;
+          const roiDays = roiHours / 24;
+          
+          toolsHTML += `
+            <div class="tool-box">
+              <img class="tool-icon" src="${tool.icon}" alt="${tool.name}">
+              <div class="tool-info">
+                <div class="tool-name">${tool.name}</div>
+                <div class="tool-resource">
+                  <img class="resource-icon" src="img/${tool.resource.toLowerCase()}_shadow.png" alt="${tool.resource}">
+                  Добывает: ${tool.resource}
+                </div>
+                <p>Стоимость крафта: ${craftCost.toFixed(2)}</p>
+                <p>Потребление энергии: ${tool.energy} (${energyCost.toFixed(2)} еды)</p>
+                <p>Потеря прочности: ${tool.durability} (${durabilityCost.toFixed(2)} золота)</p>
+                <p>Общая стоимость: ${totalCost.toFixed(2)}</p>
+                <p>Прибыль в час: ${profitPerHour.toFixed(2)}</p>
+                <p>Прибыль в сутки: ${profitPerDay.toFixed(2)}</p>
+                <p>Срок окупаемости: ${roiHours.toFixed(2)} часов (${roiDays.toFixed(2)} дней)</p>
+              </div>
+            </div>
+          `;
+        }
+        
+        resultHTML += `
+          <div class="tool-type">
+            <h2>${resource}</h2>
+            ${toolsHTML}
+          </div>
+        `;
+      }
+      
+      document.getElementById('result').innerHTML = resultHTML;
+    }
+  </script>
+</body>
+</html>
