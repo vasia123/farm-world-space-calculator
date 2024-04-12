@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Калькулятор окупаемости инструментов</title>
   <style>
     body {
@@ -67,21 +68,30 @@
     .red {
       color: red;
     }
+    #manual-prices,
+    #fetch-prices-btn,
+    #calculate-prices-btn,
+    #server-prices {
+      display: none;
+    }
   </style>
 </head>
 <body>
   <h1>Калькулятор окупаемости инструментов</h1>
-  
-  <label for="woodPrice">Цена за единицу дерева:</label>
-  <input type="number" id="woodPrice" step="0.01" value="0.0089"><br>
-  
-  <label for="foodPrice">Цена за единицу еды:</label>
-  <input type="number" id="foodPrice" step="0.01" value="0.0079"><br>
-  
-  <label for="goldPrice">Цена за единицу золота:</label>
-  <input type="number" id="goldPrice" step="0.01" value="0.01"><br>
-  
-  <button onclick="calculateROI()">Рассчитать окупаемость</button>
+
+  <button id="fetch-prices-btn" onclick="fetchPrices()">Обновить цены с сервера</button>
+  <div id="server-prices"></div>
+  <button id="manual-prices-btn" onclick="toggleManualPrices()">Ввести цены вручную</button>
+
+  <div id="manual-prices">
+    <label for="woodPrice">Цена за единицу дерева:</label>
+    <input type="number" id="woodPrice" step="0.01" value="0.0089"><br>
+    <label for="foodPrice">Цена за единицу еды:</label>
+    <input type="number" id="foodPrice" step="0.01" value="0.0079"><br>
+    <label for="goldPrice">Цена за единицу золота:</label>
+    <input type="number" id="goldPrice" step="0.01" value="0.01"><br>
+  </div>
+  <button id="calculate-prices-btn" onclick="calculateROI()">Рассчитать окупаемость</button>
   
   <div class="container" id="result"></div>
   
@@ -158,7 +168,55 @@
       
       document.getElementById('result').innerHTML = resultHTML;
     }
-    calculateROI();
+    
+    let priceInterval;
+
+    function fetchPrices() {
+      const fetchPricesBtn = document.getElementById('fetch-prices-btn');
+      const serverPrices = document.getElementById('server-prices');
+      const calculatePricesBtn = document.getElementById('calculate-prices-btn');
+      const manualPricesBtn = document.getElementById('manual-prices-btn');
+
+      manualPricesBtn.style.display = 'inline-block';
+      fetchPricesBtn.style.display = 'none';
+      serverPrices.style.display = 'none';
+      calculatePricesBtn.style.display = 'none';
+
+      fetch('https://app.farm-world.space/tokens.php')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('woodPrice').value = data.WOOD;
+          document.getElementById('foodPrice').value = data.FOOD;
+          document.getElementById('goldPrice').value = data.GOLD;
+          calculateROI();
+
+          const date = new Date(data.date_update * 1000);
+          serverPrices.innerHTML = `Загруженные цены на ${date.toLocaleString()}: <br>Дерево: ${data.WOOD}, Еда: ${data.FOOD}, Золото: ${data.GOLD}`;
+          serverPrices.style.display = 'block';
+        })
+        .catch(error => {
+          console.error('Ошибка получения цен:', error);
+          toggleManualPrices();
+          calculateROI();
+        });
+    }
+
+    function toggleManualPrices() {
+      const manualPrices = document.getElementById('manual-prices');
+      manualPrices.style.display = 'block';
+      const fetchPricesBtn = document.getElementById('fetch-prices-btn');
+      fetchPricesBtn.style.display = 'none';
+      const serverPrices = document.getElementById('server-prices');
+      serverPrices.style.display = 'none';
+      const calculatePricesBtn = document.getElementById('calculate-prices-btn');
+      calculatePricesBtn.style.display = 'inline-block';
+      const manualPricesBtn = document.getElementById('manual-prices-btn');
+      manualPricesBtn.style.display = 'none';
+      clearInterval(priceInterval);
+    }
+    fetchPrices();
+    priceInterval = setInterval(fetchPrices, 5000);
+
   </script>
 </body>
 </html>
