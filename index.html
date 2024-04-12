@@ -61,6 +61,9 @@
       vertical-align: middle;
       margin: 0px 5px 5px 5px;
     }
+    p {
+      margin: 0;
+    }
   </style>
 </head>
 <body>
@@ -120,6 +123,7 @@
           const profitPerDay = profitPerHour * 24;
           const roiHours = totalCost / profitPerHour;
           const roiDays = roiHours / 24;
+          const precision = 3;
           
           toolsHTML += `
             <div class="tool-box">
@@ -130,13 +134,13 @@
                   <img class="resource-icon" src="img/${tool.resource.toLowerCase()}_shadow.png" alt="${tool.resource}">
                   Добывает: ${tool.resource}
                 </div>
-                <p>Стоимость крафта: ${craftCost.toFixed(2)}<i class="ton-icon"></i></p>
-                <p>Потребление энергии(5 = 1 еда): ${tool.energy} (${energyCost.toFixed(2)}<i class="ton-icon"></i>)</p>
-                <p>Потеря прочности(5 = 1 золото): ${tool.durability} (${durabilityCost.toFixed(2)}<i class="ton-icon"></i>)</p>
-                <p>Общая стоимость: ${totalCost.toFixed(2)}<i class="ton-icon"></i></p>
-                <p>Прибыль в час: ${profitPerHour.toFixed(2)}<i class="ton-icon"></i></p>
-                <p>Прибыль в сутки: ${profitPerDay.toFixed(2)}<i class="ton-icon"></i></p>
-                <p>Срок окупаемости: ${roiHours.toFixed(2)} часов (${roiDays.toFixed(2)} дней)</p>
+                <p>Стоимость крафта: <b>${craftCost.toFixed(precision)}</b><i class="ton-icon"></i></p>
+                ${tool.energy > 0 ? `<p>Потребление энергии(5 = 1 еда): ${tool.energy} (<b>${energyCost.toFixed(precision)}</b><i class="ton-icon"></i>)</p>` : ''}
+                <p>Потеря прочности(5 = 1 золото): ${tool.durability} (<b>${durabilityCost.toFixed(precision)}</b><i class="ton-icon"></i>)</p>
+                <p>Общая стоимость: <b>${totalCost.toFixed(precision)}</b><i class="ton-icon"></i></p>
+                <p>Прибыль в час: <b>${profitPerHour.toFixed(precision)}</b><i class="ton-icon"></i></p>
+                <p>Прибыль в сутки: <b>${profitPerDay.toFixed(precision)}</b><i class="ton-icon"></i></p>
+                <p>Срок окупаемости: <b>${roiHours.toFixed(precision)}</b> часов (<b>${roiDays.toFixed(precision)}</b> дней)</p>
               </div>
             </div>
           `;
