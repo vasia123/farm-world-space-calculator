@@ -52,6 +52,15 @@
       height: 20px;
       margin-right: 5px;
     }
+    .ton-icon {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      background-image: url('img/ton_g.png');
+      background-size: cover;
+      vertical-align: middle;
+      margin: 0px 5px 5px 5px;
+    }
   </style>
 </head>
 <body>
@@ -121,12 +130,12 @@
                   <img class="resource-icon" src="img/${tool.resource.toLowerCase()}_shadow.png" alt="${tool.resource}">
                   Добывает: ${tool.resource}
                 </div>
-                <p>Стоимость крафта: ${craftCost.toFixed(2)}</p>
-                <p>Потребление энергии: ${tool.energy} (${energyCost.toFixed(2)} еды)</p>
-                <p>Потеря прочности: ${tool.durability} (${durabilityCost.toFixed(2)} золота)</p>
-                <p>Общая стоимость: ${totalCost.toFixed(2)}</p>
-                <p>Прибыль в час: ${profitPerHour.toFixed(2)}</p>
-                <p>Прибыль в сутки: ${profitPerDay.toFixed(2)}</p>
+                <p>Стоимость крафта: ${craftCost.toFixed(2)}<i class="ton-icon"></i></p>
+                <p>Потребление энергии(5 = 1 еда): ${tool.energy} (${energyCost.toFixed(2)}<i class="ton-icon"></i>)</p>
+                <p>Потеря прочности(5 = 1 золото): ${tool.durability} (${durabilityCost.toFixed(2)}<i class="ton-icon"></i>)</p>
+                <p>Общая стоимость: ${totalCost.toFixed(2)}<i class="ton-icon"></i></p>
+                <p>Прибыль в час: ${profitPerHour.toFixed(2)}<i class="ton-icon"></i></p>
+                <p>Прибыль в сутки: ${profitPerDay.toFixed(2)}<i class="ton-icon"></i></p>
                 <p>Срок окупаемости: ${roiHours.toFixed(2)} часов (${roiDays.toFixed(2)} дней)</p>
               </div>
             </div>
