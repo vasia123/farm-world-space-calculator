@@ -64,6 +64,9 @@
     p {
       margin: 0;
     }
+    .red {
+      color: red;
+    }
   </style>
 </head>
 <body>
@@ -139,7 +142,7 @@
                 <p>Потеря прочности(5 = 1 золото): ${tool.durability} (<b>${durabilityCost.toFixed(precision)}</b><i class="ton-icon"></i>)</p>
                 <p></span>Прибыль в час: <b>${netProfitPerHour.toFixed(precision)}</b><i class="ton-icon"></i></p>
                 <p></span>Прибыль в сутки: <b>${netProfitPerDay.toFixed(precision)}</b><i class="ton-icon"></i></p>
-                <p>Срок окупаемости: ${roiHours > 0 ? `<b>${roiHours.toFixed(1)}</b> часов (<b>${roiDays.toFixed(1)}</b> дней)` : '<b>Никогда</b>' }</p>
+                <p>Срок окупаемости: ${roiHours > 0 ? `<b>${roiHours.toFixed(1)}</b> часов (<b>${roiDays.toFixed(1)}</b> дней)` : '<b class="red">Никогда</b>' }</p>
               </div>
             </div>
           `;
