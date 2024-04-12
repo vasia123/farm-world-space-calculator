@@ -203,7 +203,7 @@
           <div><img class="resource-icon" src="img/wood_shadow.png">Дерево: <b>${Number(data.WOOD).toFixed(precision)}</b><i class="ton-icon"></i></div>
           <div><img class="resource-icon" src="img/food_shadow.png">Еда: <b>${Number(data.FOOD).toFixed(precision)}</b><i class="ton-icon"></i></div>
           <div><img class="resource-icon" src="img/gold_shadow.png">Золото: <b>${Number(data.GOLD).toFixed(precision)}</b><i class="ton-icon"></i></div>`;
-          priceTimeout = setTimeout(fetchPrices, 5000);
+          priceTimeout = setTimeout(fetchPrices, 30*1000);
         })
         .catch(error => {
           const serverError = document.getElementById('server-error');
