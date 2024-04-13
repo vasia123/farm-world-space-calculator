@@ -17,8 +17,12 @@
       <ul class="nav navbar-nav nav-flex-icons ml-auto"></ul>
     </nav>
 
-    <h1 class="pt-5">Калькулятор окупаемости инструментов <a href="https://t.me/Farm_world_bot" target="_blank">Farm
-        World</a></h1>
+    <h1 class="pt-5">
+      Калькулятор окупаемости инструментов
+      <a href="https://t.me/Farm_world_bot/app?startapp=ref_8485" target="_blank">
+        Farm World
+      </a>
+    </h1>
 
     <div v-if="state === 'server'">
       <div v-if="serverError" class="red">{{ serverError }}</div>
@@ -35,34 +39,23 @@
         <input type="number" id="goldPrice" v-model.number="prices.gold" step="0.0001"><br>
       </div>
     </div>
-
-    <div class="resources-container">
-      <!-- <div v-for="(toolsOfType, resource) in toolTypes" :key="resource" class="tool-type">
-        <h2>{{ resource }}</h2>
-        <div v-for="tool in toolsOfType" :key="tool.name" class="tool-box">
-          <img class="tool-icon" :src="tool.icon" :alt="tool.name">
+    <!-- <button @click="openAddToolModal">Добавить инструмент</button>
+    <div v-if="userTools.length > 0">
+      <h2>Добавленные инструменты</h2>
+      <div v-for="tool in userTools" :key="tool.name">
+        <div class="tool-box">
+          <img :src="tool.icon" :alt="tool.name" class="tool-icon">
           <div class="tool-info">
             <div class="tool-name">{{ tool.name }}</div>
-            <div class="tool-resource">
-              <img class="resource-icon" :src="`img/${tool.resource.toLowerCase()}_shadow.png`" :alt="tool.resource">
-              Добывает: {{ tool.resource }}
-            </div>
-            <p><span>Стоимость крафта: <b>{{ getToolCraftCost(tool).toFixed(2) }}</b><i class="ton-icon"></i></span></p>
-            <p v-if="tool.energy > 0">Потребление энергии(5 = 1 еда): {{ tool.energy }} (<b>{{
-          getToolEnergyCost(tool).toFixed(precision) }}</b><i class="ton-icon"></i>)</p>
-            <p>Потеря прочности(5 = 1 золото): {{ tool.durability }} (<b>{{
-          getToolDurabilityCost(tool).toFixed(precision) }}</b><i class="ton-icon"></i>)</p>
-            <p><span>Прибыль в час: <b>{{ getToolHourlyProfit(tool).toFixed(precision) }}</b><i
-                  class="ton-icon"></i></span></p>
-            <p><span>Прибыль в сутки: <b>{{ getToolDailyProfit(tool).toFixed(precision) }}</b><i
-                  class="ton-icon"></i></span></p>
-            <p>Срок окупаемости: <b>{{ getToolROI(tool).hours.toFixed(1) }}</b> часов (<b>{{
-          getToolROI(tool).days.toFixed(1) }}</b> дней)</p>
+            <div>Цена покупки/крафта: {{ tool.craftPrice.toFixed(2) }} <i class="ton-icon"></i></div>
+            <div>Дневная прибыль: {{ getToolDailyProfit(tool).toFixed(2) }} <i class="ton-icon"></i></div>
+            <div>ROI: {{ getToolROI(tool, tool.craftPrice).days.toFixed(1) }} дней</div>
           </div>
         </div>
-      </div> -->
+      </div>
+    </div> -->
 
-
+    <div class="resources-container">
       <div class="col-lg-4 col-md-6 col-sm-12 mb-4 px-2 text-center" v-for="(toolsOfType, resource) in toolTypes"
         :key="resource">
         <div class="card card-cascade wider">
@@ -95,7 +88,7 @@
                     </div>
                     <div class="d-block">
                       <span class="ml-3 badge sm">ROI:</span>
-                      <span class="badge sm">{{ getToolROI(tool).days.toFixed(1) }} дней</span>
+                      <span class="badge sm">{{ getToolROI(tool, getToolCraftCost(tool)).days.toFixed(1) }} дней</span>
                     </div>
                   </div>
                 </div>
@@ -139,6 +132,34 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div v-if="showAddToolModal" class="modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Добавить инструмент</h5>
+          <button type="button" class="close" @click="closeAddToolModal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="craftPrice">Выберите тип инструмента</label>
+            <select v-model="selectedTool" class="form-control">
+              <option v-for="tool in tools" :key="tool.name" :value="tool">{{ tool.name }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="craftPrice">Цена покупки/крафта</label>
+            <input type="number" id="craftPrice" class="form-control" v-model.number="craftPrice" step="0.0001">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" @click="addUserTool">Добавить</button>
+          <button type="button" class="btn btn-secondary" @click="closeAddToolModal">Отмена</button>
         </div>
       </div>
     </div>
@@ -228,10 +249,9 @@ function getToolDailyProfit(tool: Tool): number {
   return getToolHourlyProfit(tool) * 24;
 }
 
-function getToolROI(tool: Tool): { hours: number; days: number } {
-  const craftCost = getToolCraftCost(tool);
+function getToolROI(tool: Tool, craftPrice: number): { hours: number; days: number } {
   const hourlyProfit = getToolHourlyProfit(tool);
-  const roiHours = craftCost / hourlyProfit;
+  const roiHours = craftPrice / hourlyProfit;
   const roiDays = roiHours / 24;
   return { hours: roiHours, days: roiDays };
 }
@@ -256,7 +276,7 @@ function fetchPrices() {
   setState('server');
   serverError.value = '';
 
-  fetch('https://app.farm-world.space/tokens.php')
+  fetch('https://app.farm-world.space/tokens.php?access_token=FFGrIZyIsxIl17TaIxlBKHp7ZEZ55g')
     .then(response => response.json())
     .then(data => {
       prices.wood = data.WOOD;
@@ -286,6 +306,32 @@ function handleScroll() {
       scrollingNavbar.classList.remove('top-nav-collapse');
     }
   }
+}
+const showAddToolModal = ref(false);
+const selectedTool = ref<Tool | null>(null);
+const craftPrice = ref(0);
+const userTools = ref<Tool[]>([]);
+
+// function openAddToolModal() {
+//   showAddToolModal.value = true;
+//   document.body.classList.add('modal-open');
+// }
+
+function closeAddToolModal() {
+  showAddToolModal.value = false;
+  document.body.classList.remove('modal-open');
+  selectedTool.value = null;
+  craftPrice.value = 0;
+}
+
+function addUserTool() {
+  if (!selectedTool.value) return;
+  const newTool = {
+    ...selectedTool.value,
+    craftPrice: craftPrice.value
+  };
+  userTools.value.push(newTool);
+  closeAddToolModal();
 }
 
 onMounted(() => {
@@ -400,5 +446,54 @@ table.table.mwm td {
   overflow: hidden;
   max-width: 90px;
   white-space: nowrap;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-dialog {
+  max-width: 500px;
+  width: 100%;
+  margin: 1.75rem auto;
+}
+
+.modal-content {
+  background-color: #fff;
+  border-radius: 0.3rem;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.modal-title {
+  margin-bottom: 0;
+}
+
+.modal-body {
+  padding: 1rem;
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 1rem;
+  border-top: 1px solid #dee2e6;
 }
 </style>
