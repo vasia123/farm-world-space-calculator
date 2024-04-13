@@ -10,6 +10,9 @@ dependencies:
   vue-router:
     specifier: ^4.3.0
     version: 4.3.0(vue@3.4.21)
+  yandex-metrika-vue3:
+    specifier: ^1.2.2
+    version: 1.2.2(vue@3.4.21)
 
 devDependencies:
   '@rushstack/eslint-patch':
@@ -2842,6 +2845,14 @@ packages:
   /yallist@4.0.0:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
     dev: true
+
+  /yandex-metrika-vue3@1.2.2(vue@3.4.21):
+    resolution: {integrity: sha512-I43dLQZPo4wklIspIFdgEUWO/4bm5Z1D2ZNOuUSTIk+lEpQOsT/nHym7skNGmlKyI+ZgAVY2WHSfADBGomkedg==}
+    peerDependencies:
+      vue: '>=3.0.0'
+    dependencies:
+      vue: 3.4.21(typescript@5.4.2)
+    dev: false
 
   /yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
