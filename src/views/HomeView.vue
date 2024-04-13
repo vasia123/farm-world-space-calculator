@@ -41,7 +41,7 @@
       </ul>
     </nav>
 
-    <h1 class="pt-5">
+    <h1 class="title">
       {{ $t('title') }}
       <a href="https://t.me/Farm_world_bot/app?startapp=ref_8485" target="_blank">
         Farm World
@@ -436,6 +436,10 @@ input {
   margin-bottom: 10px;
 }
 
+.title {
+  margin-top: 65px;
+}
+
 .tool-box-container {
   display: flex;
   flex-wrap: wrap;
@@ -607,6 +611,7 @@ table.table.mwm td {
   color: #fff;
   width: 100%;
   position: relative;
+  overflow: hidden;
 }
 
 .ton-address {
