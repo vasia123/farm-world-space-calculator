@@ -73,7 +73,7 @@
                   <div class="mt-2">
                     <img :src="'/farm-world-space-calculator/img/' + String(resource).toLowerCase() + '_shadow.png'">
                     <span class="badge darken-3 md">
-                      {{ getResourcePrice(resource).toFixed(precision) }} <i class="ton-icon"></i>
+                      {{ getResourcePrice(resource)?.toFixed(precision) }} <i class="ton-icon"></i>
                       <!-- <span class="badge ssm red lighten-2">-11.3%</span> -->
                     </span>
                   </div>
