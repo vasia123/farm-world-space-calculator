@@ -71,7 +71,7 @@
               <div class="text-center">
                 <div class="chip gradbg-dark-grey shd mb-0 waves-effect" style="height: 50px; line-height: 16px;">
                   <div class="mt-2">
-                    <img :src="'/img/' + String(resource).toLowerCase() + '_shadow.png'">
+                    <img :src="'/farm-world-space-calculator/img/' + String(resource).toLowerCase() + '_shadow.png'">
                     <span class="badge darken-3 md">
                       0.046 <i class="ton-icon"></i>
                       <!-- <span class="badge ssm red lighten-2">-11.3%</span> -->
