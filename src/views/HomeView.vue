@@ -161,7 +161,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" @click="closeAddToolModal">Отмена</button>
+          <button type="button" class="btn btn-light" @click="closeAddToolModal">Отмена</button>
           <button type="button" class="btn btn-primary" @click="addUserTool">Добавить</button>
         </div>
       </div>
@@ -192,7 +192,7 @@ interface CraftedTool extends Tool {
   craftPrice: number;
 }
 
-const tools: Tool[] = [ // Tool
+const tools: Tool[] = [
   { name: 'Axe (Common)', icon: 'img/axe_common_shadow.png', profit: 5, wood: 2400, gold: 400, cooldown: 1, resource: 'wood', energy: 10, durability: 5, maxDurability: 100 },
   { name: 'Axe (Uncommon)', icon: 'img/axe_uncommon_shadow.png', profit: 17, wood: 7200, gold: 1200, cooldown: 1, resource: 'wood', energy: 30, durability: 15, maxDurability: 300 },
   { name: 'Axe (Rare)', icon: 'img/axe_rare_shadow.png', profit: 54, wood: 21600, gold: 3600, cooldown: 1, resource: 'wood', energy: 60, durability: 45, maxDurability: 900 },
