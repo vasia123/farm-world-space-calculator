@@ -73,7 +73,7 @@
                   <div class="mt-2">
                     <img :src="'/farm-world-space-calculator/img/' + String(resource).toLowerCase() + '_shadow.png'">
                     <span class="badge darken-3 md">
-                      0.046 <i class="ton-icon"></i>
+                      {{ getResourcePrice(resource).toFixed(precision) }} <i class="ton-icon"></i>
                       <!-- <span class="badge ssm red lighten-2">-11.3%</span> -->
                     </span>
                   </div>
@@ -90,7 +90,7 @@
                     <div class="d-block">
                       <span class="badge sm">Daily:</span>
                       <span class="badge sm gradbg-lime2">
-                        {{ getToolDailyProfit(tool).toFixed(precision) }}<i class="ton-icon"></i>
+                        {{ getToolDailyProfit(tool).toFixed(2) }}<i class="ton-icon"></i>
                       </span>
                     </div>
                     <div class="d-block">
@@ -120,7 +120,7 @@
                     </div>
                     <div class="d-inline-block w-50 text-right">
                       <span class="badge ssm">
-                        {{ Number(tool.gold * prices.gold).toFixed(2) }}<i class="ton-icon"></i>
+                        {{ Number(tool.gold * prices.gold).toFixed(precision) }}<i class="ton-icon"></i>
                       </span>
                     </div>
                   </div>
@@ -150,6 +150,8 @@ import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
 
 const precision = 4;
 
+type ResourceType = 'wood' | 'food' | 'gold'
+
 interface Tool {
   name: string;
   icon: string;
@@ -157,21 +159,21 @@ interface Tool {
   wood: number;
   gold: number;
   cooldown: number;
-  resource: string;
+  resource: ResourceType;
   energy: number;
   durability: number;
   maxDurability: number;
 }
 
 const tools: Tool[] = [
-  { name: 'Axe (Common)', icon: 'img/axe_common_shadow.png', profit: 5, wood: 2400, gold: 400, cooldown: 1, resource: 'Wood', energy: 10, durability: 5, maxDurability: 100 },
-  { name: 'Axe (Uncommon)', icon: 'img/axe_uncommon_shadow.png', profit: 17, wood: 7200, gold: 1200, cooldown: 1, resource: 'Wood', energy: 30, durability: 15, maxDurability: 300 },
-  { name: 'Axe (Rare)', icon: 'img/axe_rare_shadow.png', profit: 54, wood: 21600, gold: 3600, cooldown: 1, resource: 'Wood', energy: 60, durability: 45, maxDurability: 900 },
-  { name: 'Axe (Promo)', icon: 'img/axe_promo_shadow.png', profit: 1, wood: 110, gold: 20, cooldown: 1, resource: 'Wood', energy: 4, durability: 1, maxDurability: 25 },
-  { name: 'Bow (Common)', icon: 'img/bow_common_shadow.png', profit: 5, wood: 1200, gold: 200, cooldown: 1, resource: 'Food', energy: 0, durability: 5, maxDurability: 250 },
-  { name: 'Bow (Uncommon)', icon: 'img/bow_uncommon_shadow.png', profit: 20, wood: 4800, gold: 800, cooldown: 1, resource: 'Food', energy: 0, durability: 20, maxDurability: 1000 },
-  { name: 'Bow (Rare)', icon: 'img/bow_rare_shadow.png', profit: 80, wood: 19200, gold: 3200, cooldown: 1, resource: 'Food', energy: 0, durability: 32, maxDurability: 1600 },
-  { name: 'Pickaxe (Common)', icon: 'img/pikaxe_common_shadow.png', profit: 50, wood: 24000, gold: 4000, cooldown: 1, resource: 'Gold', energy: 66, durability: 3, maxDurability: 250 }
+  { name: 'Axe (Common)', icon: 'img/axe_common_shadow.png', profit: 5, wood: 2400, gold: 400, cooldown: 1, resource: 'wood', energy: 10, durability: 5, maxDurability: 100 },
+  { name: 'Axe (Uncommon)', icon: 'img/axe_uncommon_shadow.png', profit: 17, wood: 7200, gold: 1200, cooldown: 1, resource: 'wood', energy: 30, durability: 15, maxDurability: 300 },
+  { name: 'Axe (Rare)', icon: 'img/axe_rare_shadow.png', profit: 54, wood: 21600, gold: 3600, cooldown: 1, resource: 'wood', energy: 60, durability: 45, maxDurability: 900 },
+  { name: 'Axe (Promo)', icon: 'img/axe_promo_shadow.png', profit: 1, wood: 110, gold: 20, cooldown: 1, resource: 'wood', energy: 4, durability: 1, maxDurability: 25 },
+  { name: 'Bow (Common)', icon: 'img/bow_common_shadow.png', profit: 5, wood: 1200, gold: 200, cooldown: 1, resource: 'food', energy: 0, durability: 5, maxDurability: 250 },
+  { name: 'Bow (Uncommon)', icon: 'img/bow_uncommon_shadow.png', profit: 20, wood: 4800, gold: 800, cooldown: 1, resource: 'food', energy: 0, durability: 20, maxDurability: 1000 },
+  { name: 'Bow (Rare)', icon: 'img/bow_rare_shadow.png', profit: 80, wood: 19200, gold: 3200, cooldown: 1, resource: 'food', energy: 0, durability: 32, maxDurability: 1600 },
+  { name: 'Pickaxe (Common)', icon: 'img/pikaxe_common_shadow.png', profit: 50, wood: 24000, gold: 4000, cooldown: 1, resource: 'gold', energy: 66, durability: 3, maxDurability: 250 }
 ];
 
 const prices = reactive({
@@ -186,7 +188,11 @@ const serverError = ref('');
 let priceTimeout: number;
 
 const toolTypes = computed(() => {
-  const types: { [key: string]: Tool[] } = {};
+  const types: Record<ResourceType, Tool[]> = {
+    wood: [],
+    food: [],
+    gold: [],
+  };
 
   for (const tool of tools) {
     if (!types[tool.resource]) {
@@ -232,11 +238,11 @@ function getToolROI(tool: Tool): { hours: number; days: number } {
 
 function getResourcePrice(resource: string): number {
   switch (resource) {
-    case 'Wood':
+    case 'wood':
       return prices.wood;
-    case 'Food':
+    case 'food':
       return prices.food;
-    case 'Gold':
+    case 'gold':
       return prices.gold;
     default:
       return 0;
