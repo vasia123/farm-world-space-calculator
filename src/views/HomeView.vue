@@ -26,7 +26,6 @@
 
     <div v-if="state === 'server'">
       <div v-if="serverError" class="red">{{ serverError }}</div>
-      <button @click="setManualPrices">Ввести цены вручную</button>
     </div>
     <div v-if="state === 'local'">
       <button @click="fetchPrices">Обновить цены с сервера</button>
@@ -39,21 +38,25 @@
         <input type="number" id="goldPrice" v-model.number="prices.gold" step="0.0001"><br>
       </div>
     </div>
-    <!-- <button @click="openAddToolModal">Добавить инструмент</button>
+    <button v-if="state === 'server'" @click="setManualPrices" class="btn btn-primary">Ввести цены вручную</button>
+    <button @click="openAddToolModal" class="btn btn-secondary">Добавить инструмент</button>
     <div v-if="userTools.length > 0">
       <h2>Добавленные инструменты</h2>
-      <div v-for="tool in userTools" :key="tool.name">
-        <div class="tool-box">
-          <img :src="tool.icon" :alt="tool.name" class="tool-icon">
-          <div class="tool-info">
-            <div class="tool-name">{{ tool.name }}</div>
-            <div>Цена покупки/крафта: {{ tool.craftPrice.toFixed(2) }} <i class="ton-icon"></i></div>
-            <div>Дневная прибыль: {{ getToolDailyProfit(tool).toFixed(2) }} <i class="ton-icon"></i></div>
-            <div>ROI: {{ getToolROI(tool, tool.craftPrice).days.toFixed(1) }} дней</div>
+      <div class="tool-box-container">
+        <div v-for="(tool, index) in userTools" :key="index">
+          <div class="tool-box">
+            <img :src="tool.icon" :alt="tool.name" class="tool-icon">
+            <div class="tool-info">
+              <div class="tool-name">{{ tool.name }}</div>
+              <div>Цена покупки/крафта: {{ tool.craftPrice.toFixed(2) }} <i class="ton-icon"></i></div>
+              <div>Дневная прибыль: {{ getToolDailyProfit(tool).toFixed(2) }} <i class="ton-icon"></i></div>
+              <div>ROI: {{ getToolROI(tool, tool.craftPrice).days.toFixed(1) }} дней</div>
+              <button class="btn btn-danger btn-sm" @click="removeUserTool(index)">Удалить</button>
+            </div>
           </div>
         </div>
       </div>
-    </div> -->
+    </div>
 
     <div class="resources-container">
       <div class="col-lg-4 col-md-6 col-sm-12 mb-4 px-2 text-center" v-for="(toolsOfType, resource) in toolTypes"
@@ -153,7 +156,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="craftPrice">Цена покупки/крафта</label>
+            <label for="craftPrice">Цена покупки/крафта<i class="ton-icon"></i></label>
             <input type="number" id="craftPrice" class="form-control" v-model.number="craftPrice" step="0.0001">
           </div>
         </div>
@@ -184,6 +187,9 @@ interface Tool {
   energy: number;
   durability: number;
   maxDurability: number;
+}
+interface CraftedTool extends Tool {
+  craftPrice: number;
 }
 
 const tools: Tool[] = [
@@ -300,7 +306,7 @@ function handleScroll() {
   const scrollingNavbar = document.querySelector('.scrolling-navbar');
 
   if (navbar && scrollingNavbar) {
-    if (window.pageYOffset > 50) {
+    if (window.scrollY > 50) {
       scrollingNavbar.classList.add('top-nav-collapse');
     } else {
       scrollingNavbar.classList.remove('top-nav-collapse');
@@ -310,12 +316,12 @@ function handleScroll() {
 const showAddToolModal = ref(false);
 const selectedTool = ref<Tool | null>(null);
 const craftPrice = ref(0);
-const userTools = ref<Tool[]>([]);
+const userTools = ref<CraftedTool[]>([]);
 
-// function openAddToolModal() {
-//   showAddToolModal.value = true;
-//   document.body.classList.add('modal-open');
-// }
+function openAddToolModal() {
+  showAddToolModal.value = true;
+  document.body.classList.add('modal-open');
+}
 
 function closeAddToolModal() {
   showAddToolModal.value = false;
@@ -332,11 +338,27 @@ function addUserTool() {
   };
   userTools.value.push(newTool);
   closeAddToolModal();
+  saveUserTools();
+}
+
+function saveUserTools() {
+  localStorage.setItem('userTools', JSON.stringify(userTools.value));
+}
+function loadUserTools() {
+  const storedTools = localStorage.getItem('userTools');
+  if (storedTools) {
+    userTools.value = JSON.parse(storedTools);
+  }
+}
+function removeUserTool(index: number) {
+  userTools.value.splice(index, 1);
+  saveUserTools();
 }
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll);
   fetchPrices();
+  loadUserTools();
 });
 
 onUnmounted(() => {
@@ -355,10 +377,23 @@ input {
   margin-bottom: 10px;
 }
 
+.tool-box-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .resources-container {
   display: flex;
   flex-wrap: wrap;
   margin-top: 20px;
+}
+
+.badge.ssm {
+  font-size: 12px;
+}
+
+.badge.sm {
+  font-size: 14px;
 }
 
 .tool-type {
@@ -376,6 +411,7 @@ input {
   border-radius: 5px;
   padding: 10px;
   margin-bottom: 10px;
+  margin-right: 10px;
   display: flex;
 }
 
