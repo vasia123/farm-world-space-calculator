@@ -4,6 +4,7 @@ import vue from '@vitejs/plugin-vue';
 import VueDevTools from 'vite-plugin-vue-devtools';
 
 export default defineConfig({
+  base: '/farm-world-space-calculator/',
   plugins: [vue(), VueDevTools()],
   resolve: {
     alias: {
