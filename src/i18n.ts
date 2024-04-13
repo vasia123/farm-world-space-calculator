@@ -1,0 +1,56 @@
+// src/i18n.ts
+import { createI18n } from 'vue-i18n';
+
+const i18n = createI18n({
+    locale: navigator.language.includes('ru') ? 'ru' : 'en',
+    fallbackLocale: 'en',
+    legacy: false,
+    messages: {
+        en: {
+            title: "Tool ROI Calculator",
+            description: "Calculate the return on investment for tools in Farm World",
+            woodPrice: "Price per unit of Wood",
+            foodPrice: "Price per unit of Food",
+            goldPrice: "Price per unit of Gold",
+            fetchPrices: "Fetch prices from server",
+            manualPrices: "Set prices manually",
+            addTool: "Add Tool",
+            addedTools: "Added Tools",
+            dailyProfit: "Daily",
+            craftCost: "Craft Cost",
+            days: "days",
+            remove: "Remove",
+            chooseToolType: "Choose tool type",
+            craftPriceFull: "Craft Price",
+            craftPriceShort: "Investments",
+            cancel: "Cancel",
+            add: "Add",
+            appreciationText: 'Say thanks❤️ to the author:',
+            copiedMessage: 'Address copied to clipboard',
+        },
+        ru: {
+            title: "Калькулятор окупаемости",
+            description: "Рассчитайте окупаемость инструментов в Farm World",
+            woodPrice: "Цена за единицу дерева",
+            foodPrice: "Цена за единицу еды",
+            goldPrice: "Цена за единицу золота",
+            fetchPrices: "Обновить цены с сервера",
+            manualPrices: "Ввести цены вручную",
+            addTool: "Добавить инструмент",
+            addedTools: "Добавленные инструменты",
+            dailyProfit: "В день",
+            craftCost: "Цена крафта",
+            days: "дней",
+            remove: "Удалить",
+            chooseToolType: "Выберите тип инструмента",
+            craftPriceFull: "Цена покупки/крафта",
+            craftPriceShort: "Вложения",
+            cancel: "Отмена",
+            add: "Добавить",
+            appreciationText: 'Сказать спасибо❤️ автору:',
+            copiedMessage: 'Адрес скопирован в буфер обмена',
+        },
+    },
+});
+
+export default i18n;

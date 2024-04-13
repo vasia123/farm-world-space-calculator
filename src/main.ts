@@ -7,11 +7,9 @@ import { initYandexMetrika } from 'yandex-metrika-vue3';
 import App from './App.vue'
 import router from './router'
 import type { Router } from 'vue-router';
+import i18n from './i18n';
 
 const app = createApp(App)
-
-app.use(createPinia())
-app.use(router)
 
 interface MetrikaConfig {
     id: string;
@@ -26,6 +24,9 @@ const metrikaConfig: MetrikaConfig = {
     scriptSrc: "https://mc.yandex.ru/metrika/tag.js"
 };
 
+app.use(createPinia())
+app.use(router)
 app.use(initYandexMetrika, metrikaConfig)
+app.use(i18n)
 
-app.mount('#app')
+app.mount('#app');
