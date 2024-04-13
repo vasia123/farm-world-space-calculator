@@ -161,8 +161,8 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" @click="addUserTool">Добавить</button>
           <button type="button" class="btn btn-secondary" @click="closeAddToolModal">Отмена</button>
+          <button type="button" class="btn btn-primary" @click="addUserTool">Добавить</button>
         </div>
       </div>
     </div>
