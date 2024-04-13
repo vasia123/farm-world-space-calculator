@@ -2422,7 +2422,7 @@ strong {
   transform: scale(1.1);
 }
 
-.pattern-1 {
+/* .pattern-1 {
   background: url(/img/overlays/01.png);
   background-attachment: fixed;
 }
@@ -2465,7 +2465,9 @@ strong {
 .pattern-9 {
   background: url(/img/overlays/09.png);
   background-attachment: fixed;
-} /*!
+} */
+
+/*!
  * Waves v0.7.6
  * http://fian.my.id/Waves
  *
@@ -11450,13 +11452,13 @@ body.scrollable {
   height: 20px;
 }
 
-.carousel .carousel-control-prev-icon {
+/* .carousel .carousel-control-prev-icon {
   background-image: url(/img/svg/arrow_left.svg);
 }
 
 .carousel .carousel-control-next-icon {
   background-image: url(/img/svg/arrow_right.svg);
-}
+} */
 
 .carousel .carousel-indicators li {
   width: 0.625rem;
@@ -16992,8 +16994,7 @@ table.table a.btn.btn-whatsapp {
 .pswp__button--arrow--right::before {
   width: 44px;
   height: 44px;
-  background: url(/img/lightbox/default-skin.png) 0 0
-    no-repeat;
+  /* background: url(/img/lightbox/default-skin.png) 0 0 no-repeat; */
   background-size: 264px 88px;
 }
 
@@ -17004,7 +17005,7 @@ table.table a.btn.btn-whatsapp {
   .pswp--svg .pswp__button,
   .pswp--svg .pswp__button--arrow--left::before,
   .pswp--svg .pswp__button--arrow--right::before {
-    background-image: url(/img/lightbox/default-skin.svg);
+    /* background-image: url(/img/lightbox/default-skin.svg); */
   }
 
   .pswp--svg .pswp__button--arrow--left,
@@ -17277,10 +17278,10 @@ table.table a.btn.btn-whatsapp {
   opacity: 1;
 }
 
-.pswp__preloader--active .pswp__preloader__icn {
+/* .pswp__preloader--active .pswp__preloader__icn {
   background: url(/img/lightbox/preloader.gif) 0 0
     no-repeat;
-}
+} */
 
 .pswp--css_animation .pswp__preloader--active {
   opacity: 1;
@@ -19301,7 +19302,7 @@ button.mdb-autocomplete-clear svg {
   font-family: 'object-fit: cover;';
 }
 
-.sn-bg-1 {
+/* .sn-bg-1 {
   background-image: url('https://web.archive.org/web/20211116072624im_/https://mdbootstrap.com/img/Photos/Others/sidenav1.jpg');
 }
 
@@ -19315,7 +19316,7 @@ button.mdb-autocomplete-clear svg {
 
 .sn-bg-4 {
   background-image: url('https://web.archive.org/web/20211116072624im_/https://mdbootstrap.com/img/Photos/Others/sidenav4.jpg');
-}
+} */
 
 .side-nav {
   position: fixed;

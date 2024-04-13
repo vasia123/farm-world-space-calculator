@@ -73,7 +73,7 @@
                   <div class="mt-2">
                     <img :src="'/farm-world-space-calculator/img/' + String(resource).toLowerCase() + '_shadow.png'">
                     <span class="badge darken-3 md">
-                      {{ getResourcePrice(resource)?.toFixed(precision) }} <i class="ton-icon"></i>
+                      {{ getResourcePrice(resource).toFixed(precision) }} <i class="ton-icon"></i>
                       <!-- <span class="badge ssm red lighten-2">-11.3%</span> -->
                     </span>
                   </div>
@@ -236,14 +236,14 @@ function getToolROI(tool: Tool): { hours: number; days: number } {
   return { hours: roiHours, days: roiDays };
 }
 
-function getResourcePrice(resource: string): number {
+const getResourcePrice = (resource: string): number => {
   switch (resource) {
     case 'wood':
-      return prices.wood;
+      return Number(prices.wood);
     case 'food':
-      return prices.food;
+      return Number(prices.food);
     case 'gold':
-      return prices.gold;
+      return Number(prices.gold);
     default:
       return 0;
   }

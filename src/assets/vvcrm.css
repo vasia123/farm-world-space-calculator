@@ -636,7 +636,7 @@ form .md-form .form-control::placeholder {
 .status-light-grey {
   background: #d4d4d4 !important;
 }
-
+/* 
 .pattern-1 {
   background: url('/css/img/01.png');
   background-attachment: fixed;
@@ -672,7 +672,7 @@ form .md-form .form-control::placeholder {
 .pattern-9 {
   background: url('/css/img/09.png');
   background-attachment: fixed;
-}
+} */
 /* ======================= OA Token =================== */
 img.pf {
   width: 32px;
@@ -749,21 +749,21 @@ img.list-oa {
 }
 
 .b-atomic {
-  background-image: url('/img/F12/wax/atomichub2.png');
+  /* background-image: url('/img/F12/wax/atomichub2.png'); */
   background-repeat: no-repeat;
   background-position-y: top;
   background-position-x: right;
   vertical-align: top;
 }
 .b-alcor {
-  background-image: url('/img/F12/wax/alcor2.png');
+  /* background-image: url('/img/F12/wax/alcor2.png'); */
   background-repeat: no-repeat;
   background-position-y: top;
   background-position-x: left;
   vertical-align: top;
 }
 .b-fw {
-  background-image: url('/img/F12/wax/fw2.png');
+  /* background-image: url('/img/F12/wax/fw2.png'); */
   background-repeat: no-repeat;
   background-position-y: top;
   background-position-x: left;
