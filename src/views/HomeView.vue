@@ -110,7 +110,7 @@
                 <div class="chip gradbg-dark-grey shd mb-0 waves-effect resources-big">
                   <div class="mt-2 ml-2">
                     <img :src="'/farm-world-space-calculator/img/' + String(resource).toLowerCase() + '_shadow.png'">
-                    <span class="badge darken-3 md">
+                    <span class="badge darken-3 md no-shadow">
                       {{ formatNumber(getResourcePrice(resource)) }} <i class="ton-icon"></i>
                       <!-- <span class="badge ssm red lighten-2">-11.3%</span> -->
                     </span>
@@ -125,14 +125,14 @@
                   </div>
                   <div class="d-inline-block w-75 flex-right vtop">
                     <div class="d-block">
-                      <span class="badge sm">{{ $t('dailyProfit') }}:</span>
-                      <span class="badge sm gradbg-lime2">
+                      <span class="badge sm no-shadow">{{ $t('dailyProfit') }}:</span>
+                      <span class="badge sm gradbg-lime2 ml-1">
                         {{ formatNumber(getToolDailyProfit(tool)) }}<i class="ton-icon"></i>
                       </span>
                     </div>
-                    <div class="d-block">
-                      <span class="ml-3 badge sm">ROI:</span>
-                      <span class="badge sm">
+                    <div class="d-block mt-2">
+                      <span class="ml-3 badge sm no-shadow">ROI:</span>
+                      <span class="badge grey darken-2 sm ml-1">
                         {{ getToolROI(tool, getToolCraftCost(tool)).days.toFixed(1) }} {{ $t('days') }}
                       </span>
                     </div>
@@ -142,11 +142,11 @@
 
                   <div class="d-block fw_craft" v-if="tool.wood > 0">
                     <div class="d-inline-block w-50 text-right">
-                      <span class="badge ssm">{{ tool.wood }}</span>
+                      <span class="badge ssm no-shadow">{{ tool.wood }}</span>
                       <img src="/img/wood_shadow.png" style="height: 16px;">
                     </div>
                     <div class="d-inline-block w-50 text-right">
-                      <span class="badge ssm">
+                      <span class="badge ssm no-shadow">
                         {{ formatNumber(tool.wood * prices.wood) }}<i class="ton-icon"></i>
                       </span>
                     </div>
@@ -154,11 +154,11 @@
 
                   <div class="d-block fw_craft" v-if="tool.gold > 0">
                     <div class="d-inline-block w-50 text-right">
-                      <span class="badge ssm">{{ tool.gold }}</span>
+                      <span class="badge ssm no-shadow">{{ tool.gold }}</span>
                       <img src="/img/gold_shadow.png" style="height: 16px;">
                     </div>
                     <div class="d-inline-block w-50 text-right">
-                      <span class="badge ssm">
+                      <span class="badge ssm no-shadow">
                         {{ formatNumber(tool.gold * prices.gold) }}<i class="ton-icon"></i>
                       </span>
                     </div>
@@ -166,7 +166,7 @@
 
                   <div class="d-block fw_craft">
                     <div class="d-inline-block w-50 text-right">
-                      <span class="badge sm">{{ $t('craftCost') }}:</span>
+                      <span class="badge sm no-shadow">{{ $t('craftCost') }}:</span>
                     </div>
                     <div class="d-inline-block w-50 text-right">
                       <span class="badge grey darken-2 sm">
@@ -511,6 +511,9 @@ function formatNumber(num: number | string): string {
   let firstSignificantDigitPos = decimalPos + 1;
   while (numString[firstSignificantDigitPos] === '0') {
     firstSignificantDigitPos++;
+  }
+  if (firstSignificantDigitPos > decimalPos + 1 + 8) {
+    return numString.substring(0, decimalPos);
   }
   const decimalPlaces = firstSignificantDigitPos - decimalPos - 1 + 2;
   return number.toFixed(decimalPlaces);

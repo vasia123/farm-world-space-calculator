@@ -295,9 +295,11 @@ table.table.mwm td {
   cursor: auto;
 }
 .resources-big .badge {
+  margin-top: 4px;
+}
+.no-shadow {
   -webkit-box-shadow: none;
   box-shadow: none;
-  margin-top: 4px;
 }
 .resources-big .ton-icon {
   margin-bottom: 3px;
