@@ -5,11 +5,11 @@
         <img class="mr-1" src="/img/ton_g.png">
         <strong>{{ formatNumber(tonPriceUsd) }}$</strong>
       </div>
-      <div class="alert alert-light p-1 m-0 mr-1 fw_topBox token_FWF" style="">
+      <div class="alert alert-light p-1 m-0 mr-1 fw_topBox token_FWW" style="">
         <img class="mr-1" src="/img/wood_shadow.png">
         <strong>{{ formatNumber(prices.wood) }}</strong>
       </div>
-      <div class="alert alert-light p-1 m-0 mr-1 fw_topBox token_FWW" style="">
+      <div class="alert alert-light p-1 m-0 mr-1 fw_topBox token_FWF" style="">
         <img class="mr-1" src="/img/food_shadow.png">
         <strong>{{ formatNumber(prices.food) }}</strong>
       </div>

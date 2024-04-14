@@ -779,6 +779,10 @@ img.list-oa {
   border: 2px solid #9a4e00;
 }
 .token_FWF {
+  color: #921017 !important;
+  border: 2px solid #921017;
+}
+.token_TON {
   color: #00afe4 !important;
   border: 2px solid #005892;
 }
