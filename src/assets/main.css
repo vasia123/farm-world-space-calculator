@@ -4,8 +4,6 @@
 @import './custom.css';
 
 body {
-  margin: 0;
-  padding: 0;
   background-color: #424242;
   color: #fff;
 }
