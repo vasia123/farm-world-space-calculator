@@ -108,7 +108,7 @@
             <div class="m-1">
               <div class="text-center">
                 <div class="chip gradbg-dark-grey shd mb-0 waves-effect resources-big">
-                  <div class="mt-2">
+                  <div class="mt-2 ml-2">
                     <img :src="'/farm-world-space-calculator/img/' + String(resource).toLowerCase() + '_shadow.png'">
                     <span class="badge darken-3 md">
                       {{ formatNumber(getResourcePrice(resource)) }} <i class="ton-icon"></i>
