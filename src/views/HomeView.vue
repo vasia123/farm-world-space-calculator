@@ -522,7 +522,7 @@ async function fetchTonPrice() {
     const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd');
     const data = await response.json();
     tonPriceUsd.value = data['the-open-network'].usd;
-    priceTonTimeout = setInterval(fetchTonPrice, 60000);
+    priceTonTimeout = setInterval(fetchTonPrice, 5 * 60 * 1000);
   } catch (error) {
     console.error('Ошибка получения цены TON Coin:', error);
     tonPriceUsd.value = 'err'
