@@ -1,17 +1,20 @@
 <template>
   <div class="grey darken-3 px-3 py-1">
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top scrolling-navbar py-1">
-      <!-- <div class="alert alert-light p-1 m-0 fw_topBox" style=""><strong id="waxp_usdt">1ï¿¦ = 0.336$</strong></div> -->
+      <div class="alert alert-light p-1 m-0 mr-1 fw_topBox token_TON" style="">
+        <img class="mr-1" src="/img/ton_g.png">
+        <strong>{{ formatNumber(tonPriceUsd) }}$</strong>
+      </div>
       <div class="alert alert-light p-1 m-0 mr-1 fw_topBox token_FWF" style="">
-        <img class="mr-1" src="/img/wood_shadow.png" style="height: 18px;">
+        <img class="mr-1" src="/img/wood_shadow.png">
         <strong>{{ formatNumber(prices.wood) }}</strong>
       </div>
       <div class="alert alert-light p-1 m-0 mr-1 fw_topBox token_FWW" style="">
-        <img class="mr-1" src="/img/food_shadow.png" style="height: 18px;">
+        <img class="mr-1" src="/img/food_shadow.png">
         <strong>{{ formatNumber(prices.food) }}</strong>
       </div>
       <div class="alert alert-light p-1 m-0 fw_topBox token_FWG" style="">
-        <img class="mr-1" src="/img/gold_shadow.png" style="height: 18px;">
+        <img class="mr-1" src="/img/gold_shadow.png">
         <strong>{{ formatNumber(prices.gold) }}</strong>
       </div>
       <ul class="nav navbar-nav nav-flex-icons ml-auto">
@@ -104,7 +107,7 @@
           <div class="view view-cascade grey darken-3">
             <div class="m-1">
               <div class="text-center">
-                <div class="chip gradbg-dark-grey shd mb-0 waves-effect" style="height: 50px; line-height: 16px;">
+                <div class="chip gradbg-dark-grey shd mb-0 waves-effect resources-big">
                   <div class="mt-2">
                     <img :src="'/farm-world-space-calculator/img/' + String(resource).toLowerCase() + '_shadow.png'">
                     <span class="badge darken-3 md">
@@ -116,10 +119,9 @@
               </div>
               <div class="d-block mt-4" v-for="tool in toolsOfType" :key="tool.name">
                 <div class="d-inline-block w-50 b-atomic">
-                  <div class="d-inline-block w-25 flex-right" style="line-height: 10px;">
-                    <a target="_blank">
-                      <img :src="tool.icon" :alt="tool.name" class="img-fluid">
-                    </a>
+                  <div class="d-inline-block w-25 flex-right">
+                    <img :src="tool.icon" :alt="tool.name" class="img-fluid ml-2">
+                    <!-- <span class="sss-font c-white">{{ tool.name }}</span> -->
                   </div>
                   <div class="d-inline-block w-75 flex-right vtop">
                     <div class="d-block">
@@ -327,6 +329,7 @@ const state = ref<'server' | 'local'>('server');
 const serverPrices = ref();
 const serverError = ref('');
 let priceTimeout: number;
+let priceTonTimeout: number;
 
 const toolTypes = computed(() => {
   const types: Record<ResourceType, Tool[]> = {
@@ -512,6 +515,19 @@ function formatNumber(num: number | string): string {
   const decimalPlaces = firstSignificantDigitPos - decimalPos - 1 + 2;
   return number.toFixed(decimalPlaces);
 }
+const tonPriceUsd = ref<number | string>(0);
+
+async function fetchTonPrice() {
+  try {
+    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd');
+    const data = await response.json();
+    tonPriceUsd.value = data['the-open-network'].usd;
+    priceTonTimeout = setInterval(fetchTonPrice, 60000);
+  } catch (error) {
+    console.error('Ошибка получения цены TON Coin:', error);
+    tonPriceUsd.value = 'err'
+  }
+}
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll);
@@ -521,10 +537,12 @@ onMounted(() => {
   if (savedLanguage) {
     locale.value = savedLanguage;
   }
+  fetchTonPrice();
 });
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
   window.clearTimeout(priceTimeout);
+  window.clearTimeout(priceTonTimeout);
 });
 </script>

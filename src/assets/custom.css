@@ -7,6 +7,21 @@ input {
   margin-bottom: 10px;
 }
 
+a,
+.green {
+  text-decoration: none;
+  color: hsla(190, 100%, 49%, 1);
+  transition: 0.4s;
+  padding: 3px;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(190, 100%, 49%, 0.2);
+    color: #fff;
+  }
+}
+
 .title {
   margin-top: 75px;
   font-size: 24px;
@@ -266,6 +281,19 @@ table.table.mwm td {
 .gradbg-lime2 .ton-icon {
   margin-right: 0px;
   margin-bottom: 2px;
+}
+.fw_topBox img {
+  height: 18px;
+}
+.token_TON img {
+  margin-bottom: 3px;
+  margin-top: 0px;
+  height: 15px;
+}
+.resources-big {
+  height: 50px;
+  line-height: 16px;
+  cursor: auto;
 }
 
 @keyframes fade-in-out {
