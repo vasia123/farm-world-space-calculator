@@ -214,6 +214,11 @@ table.table.mwm td {
 .ton-address {
   cursor: pointer;
   text-decoration: underline;
+  font-size: 10px;
+}
+
+.ton-address:hover {
+  text-decoration: none;
 }
 
 .copied-message {
