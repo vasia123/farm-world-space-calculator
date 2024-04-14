@@ -133,8 +133,9 @@
                     <div class="d-block mt-2">
                       <span class="ml-3 badge sm no-shadow">ROI:</span>
                       <span class="badge grey darken-2 sm ml-1">
-                        {{ getToolROI(tool, getToolCraftCost(tool)).days.toFixed(1) }} {{ $t('days') }}
+                        {{ getToolROI(tool, getToolCraftCost(tool)).days.toFixed(1) }}
                       </span>
+                      {{ $t('days') }}
                     </div>
                   </div>
                 </div>
