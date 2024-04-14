@@ -4,15 +4,15 @@
       <!-- <div class="alert alert-light p-1 m-0 fw_topBox" style=""><strong id="waxp_usdt">1ï¿¦ = 0.336$</strong></div> -->
       <div class="alert alert-light p-1 m-0 mr-1 fw_topBox token_FWF" style="">
         <img class="mr-1" src="/img/wood_shadow.png" style="height: 18px;">
-        <strong>{{ Number(prices.wood).toFixed(precision) }}</strong>
+        <strong>{{ formatNumber(prices.wood) }}</strong>
       </div>
       <div class="alert alert-light p-1 m-0 mr-1 fw_topBox token_FWW" style="">
         <img class="mr-1" src="/img/food_shadow.png" style="height: 18px;">
-        <strong>{{ Number(prices.food).toFixed(precision) }}</strong>
+        <strong>{{ formatNumber(prices.food) }}</strong>
       </div>
       <div class="alert alert-light p-1 m-0 fw_topBox token_FWG" style="">
         <img class="mr-1" src="/img/gold_shadow.png" style="height: 18px;">
-        <strong>{{ Number(prices.gold).toFixed(precision) }}</strong>
+        <strong>{{ formatNumber(prices.gold) }}</strong>
       </div>
       <ul class="nav navbar-nav nav-flex-icons ml-auto">
         <li class="nav-item">
@@ -38,6 +38,15 @@
             </svg>
           </button>
         </li>
+        <li class="nav-item">
+          <button class="nav-link btn btn-link" @click="toggleSettingsMenu">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+              <path d="M0 0h24v24H0z" fill="none" />
+              <path
+                d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z" />
+            </svg>
+          </button>
+        </li>
       </ul>
     </nav>
 
@@ -51,34 +60,40 @@
     <div v-if="state === 'server'">
       <div v-if="serverError" class="red">{{ serverError }}</div>
     </div>
-    <div v-if="state === 'local'">
-      <button @click="fetchPrices">{{ $t('fetchPrices') }}</button>
-      <div>
-        <label for="woodPrice">{{ $t('woodPrice') }}:</label>
-        <input type="number" id="woodPrice" v-model.number="prices.wood" step="0.0001"><br>
-        <label for="foodPrice">{{ $t('foodPrice') }}:</label>
-        <input type="number" id="foodPrice" v-model.number="prices.food" step="0.0001"><br>
-        <label for="goldPrice">{{ $t('goldPrice') }}:</label>
-        <input type="number" id="goldPrice" v-model.number="prices.gold" step="0.0001"><br>
-      </div>
-    </div>
-    <button v-if="state === 'server'" @click="setManualPrices" class="btn btn-primary">{{ $t('manualPrices') }}</button>
-    <button @click="openAddToolModal" class="btn btn-secondary">{{ $t('addTool') }}</button>
+
     <div v-if="userTools.length > 0">
-      <h2>{{ $t('addedTools') }}</h2>
       <div class="tool-box-container">
-        <div v-for="(tool, index) in userTools" :key="index">
-          <div class="tool-box">
-            <img :src="tool.icon" :alt="tool.name" class="tool-icon">
-            <div class="tool-info">
-              <div class="tool-name">{{ tool.name }}</div>
-              <div>{{ $t('craftPriceShort') }}: {{ tool.craftPrice.toFixed(2) }} <i class="ton-icon"></i></div>
-              <div>{{ $t('dailyProfit') }}: {{ getToolDailyProfit(tool).toFixed(2) }} <i class="ton-icon"></i></div>
-              <div>ROI: {{ getToolROI(tool, tool.craftPrice).days.toFixed(1) }} {{ $t('days') }}</div>
-              <button class="btn btn-danger btn-sm" @click="removeUserTool(index)">{{ $t('remove') }}</button>
-            </div>
+        <div v-for="(tool, index) in userTools" :key="index" class="tool-box">
+          <img :src="tool.icon" :alt="tool.name" class="mr-2" width="20px" height="20px">
+          <div class="tool-info">
+            <span class="mr-2">
+              {{ $t('dailyProfit') }}:
+            </span>
+            <span class="mr-2">
+              {{ formatNumber(tool.profit * 24) }}
+              <img :src="'/farm-world-space-calculator/img/' + String(tool.resource).toLowerCase() + '_shadow.png'"
+                width="20px" height="20px" class="mb-1" />
+            </span>
+            <span>
+              {{ formatNumber(getToolDailyProfit(tool)) }} <i class="ton-icon"></i>
+            </span>
           </div>
         </div>
+      </div>
+      <div class="mt-2">
+        <p>
+          <span class="mr-3">
+            {{ $t('dailyProfitFull') }}:
+          </span>
+          <span v-for="(amount, resource) in getUserToolsResourceSummary()" :key="resource" class="mr-4">
+            {{ formatNumber(amount) }}
+            <img :src="'/farm-world-space-calculator/img/' + resource + '_shadow.png'" width="20px" height="20px"
+              class="mb-1" />
+          </span>
+          <span class="mr-3">
+            {{ formatNumber(getUserToolsProfitSummary()) }} <i class="ton-icon"></i>
+          </span>
+        </p>
       </div>
     </div>
 
@@ -93,7 +108,7 @@
                   <div class="mt-2">
                     <img :src="'/farm-world-space-calculator/img/' + String(resource).toLowerCase() + '_shadow.png'">
                     <span class="badge darken-3 md">
-                      {{ getResourcePrice(resource).toFixed(precision) }} <i class="ton-icon"></i>
+                      {{ formatNumber(getResourcePrice(resource)) }} <i class="ton-icon"></i>
                       <!-- <span class="badge ssm red lighten-2">-11.3%</span> -->
                     </span>
                   </div>
@@ -110,13 +125,14 @@
                     <div class="d-block">
                       <span class="badge sm">{{ $t('dailyProfit') }}:</span>
                       <span class="badge sm gradbg-lime2">
-                        {{ getToolDailyProfit(tool).toFixed(2) }}<i class="ton-icon"></i>
+                        {{ formatNumber(getToolDailyProfit(tool)) }}<i class="ton-icon"></i>
                       </span>
                     </div>
                     <div class="d-block">
                       <span class="ml-3 badge sm">ROI:</span>
-                      <span class="badge sm">{{ getToolROI(tool, getToolCraftCost(tool)).days.toFixed(1) }} {{
-          $t('days') }}</span>
+                      <span class="badge sm">
+                        {{ getToolROI(tool, getToolCraftCost(tool)).days.toFixed(1) }} {{ $t('days') }}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -129,7 +145,7 @@
                     </div>
                     <div class="d-inline-block w-50 text-right">
                       <span class="badge ssm">
-                        {{ Number(tool.wood * prices.wood).toFixed(2) }}<i class="ton-icon"></i>
+                        {{ formatNumber(tool.wood * prices.wood) }}<i class="ton-icon"></i>
                       </span>
                     </div>
                   </div>
@@ -141,7 +157,7 @@
                     </div>
                     <div class="d-inline-block w-50 text-right">
                       <span class="badge ssm">
-                        {{ Number(tool.gold * prices.gold).toFixed(precision) }}<i class="ton-icon"></i>
+                        {{ formatNumber(tool.gold * prices.gold) }}<i class="ton-icon"></i>
                       </span>
                     </div>
                   </div>
@@ -152,7 +168,7 @@
                     </div>
                     <div class="d-inline-block w-50 text-right">
                       <span class="badge grey darken-2 sm">
-                        {{ getToolCraftCost(tool).toFixed(2) }}<i class="ton-icon"></i>
+                        {{ formatNumber(getToolCraftCost(tool)) }}<i class="ton-icon"></i>
                       </span>
                     </div>
                   </div>
@@ -201,6 +217,51 @@
       </div>
     </div>
   </div>
+
+  <div v-if="showSettingsMenu" class="settings-menu">
+    <div class="settings-menu-header">
+      <h3>{{ $t('settings') }}</h3>
+      <button type="button" class="close" @click="toggleSettingsMenu" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="settings-menu-content">
+      <div v-if="state === 'local'">
+        <div>
+          <label for="woodPrice">{{ $t('woodPrice') }}:</label>
+          <input type="number" id="woodPrice" v-model.number="prices.wood" step="0.0001"><br>
+          <label for="foodPrice">{{ $t('foodPrice') }}:</label>
+          <input type="number" id="foodPrice" v-model.number="prices.food" step="0.0001"><br>
+          <label for="goldPrice">{{ $t('goldPrice') }}:</label>
+          <input type="number" id="goldPrice" v-model.number="prices.gold" step="0.0001"><br>
+        </div>
+      </div>
+      <button v-if="state === 'server'" @click="setManualPrices" class="btn btn-light">{{ $t('manualPrices')
+        }}</button>
+      <button v-if="state === 'local'" @click="fetchPrices" class="btn btn-primary">{{ $t('fetchPrices') }}</button>
+      <h5 class="my-4">{{ $t('addedTools') }}</h5>
+      <div v-if="userTools.length > 0">
+        <ul class="user-tools-list">
+          <li v-for="(tool, index) in userTools" :key="index">
+            <img :src="tool.icon" :alt="tool.name" class="small" width="20px" height="20px">
+            {{ tool.name }}
+            <button @click="removeUserTool(index)" class="remove-tool-button">
+              <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision"
+                text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd"
+                clip-rule="evenodd" viewBox="0 0 456 511.82" width="15" height="15">
+                <path fill="#FD3B3B"
+                  d="M48.42 140.13h361.99c17.36 0 29.82 9.78 28.08 28.17l-30.73 317.1c-1.23 13.36-8.99 26.42-25.3 26.42H76.34c-13.63-.73-23.74-9.75-25.09-24.14L20.79 168.99c-1.74-18.38 9.75-28.86 27.63-28.86zM24.49 38.15h136.47V28.1c0-15.94 10.2-28.1 27.02-28.1h81.28c17.3 0 27.65 11.77 27.65 28.01v10.14h138.66c.57 0 1.11.07 1.68.13 10.23.93 18.15 9.02 18.69 19.22.03.79.06 1.39.06 2.17v42.76c0 5.99-4.73 10.89-10.62 11.19-.54 0-1.09.03-1.63.03H11.22c-5.92 0-10.77-4.6-11.19-10.38 0-.72-.03-1.47-.03-2.23v-39.5c0-10.93 4.21-20.71 16.82-23.02 2.53-.45 5.09-.37 7.67-.37zm83.78 208.38c-.51-10.17 8.21-18.83 19.53-19.31 11.31-.49 20.94 7.4 21.45 17.57l8.7 160.62c.51 10.18-8.22 18.84-19.53 19.32-11.32.48-20.94-7.4-21.46-17.57l-8.69-160.63zm201.7-1.74c.51-10.17 10.14-18.06 21.45-17.57 11.32.48 20.04 9.14 19.53 19.31l-8.66 160.63c-.52 10.17-10.14 18.05-21.46 17.57-11.31-.48-20.04-9.14-19.53-19.32l8.67-160.62zm-102.94.87c0-10.23 9.23-18.53 20.58-18.53 11.34 0 20.58 8.3 20.58 18.53v160.63c0 10.23-9.24 18.53-20.58 18.53-11.35 0-20.58-8.3-20.58-18.53V245.66z" />
+              </svg>
+            </button>
+          </li>
+        </ul>
+      </div>
+      <div v-else class="no-tools mb-2">
+        {{ $t('noAddedTools') }}
+      </div>
+      <button @click="openAddToolModal" class="btn btn-secondary mt-2">{{ $t('addTool') }}</button>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -226,8 +287,6 @@ const copyAddress = async () => {
     console.error('Failed to copy address:', error);
   }
 };
-
-const precision = 4;
 
 type ResourceType = 'wood' | 'food' | 'gold'
 
@@ -306,7 +365,7 @@ function getToolHourlyProfit(tool: Tool): number {
   return netProfit;
 }
 
-function getToolDailyProfit(tool: Tool): number {
+function getToolDailyProfit(tool: Tool) {
   return getToolHourlyProfit(tool) * 24;
 }
 
@@ -375,6 +434,7 @@ const userTools = ref<CraftedTool[]>([]);
 
 function openAddToolModal() {
   showAddToolModal.value = true;
+  showSettingsMenu.value = false;
   document.body.classList.add('modal-open');
 }
 
@@ -410,6 +470,49 @@ function removeUserTool(index: number) {
   saveUserTools();
 }
 
+const showSettingsMenu = ref(false);
+
+function toggleSettingsMenu() {
+  showSettingsMenu.value = !showSettingsMenu.value;
+}
+function getUserToolsResourceSummary(): Record<string, number> {
+  const resourceSummary: Record<string, number> = {};
+  userTools.value.forEach(tool => {
+    const resource = tool.resource
+    const amount = tool.profit * 24;
+    if (amount > 0) {
+      if (resourceSummary[resource]) {
+        resourceSummary[resource] += amount;
+      } else {
+        resourceSummary[resource] = amount;
+      }
+    }
+  });
+  return resourceSummary;
+}
+
+function getUserToolsProfitSummary() {
+  return userTools.value.reduce((sum, tool) => sum + getToolDailyProfit(tool), 0);
+}
+
+function formatNumber(num: number | string): string {
+  const number = Number(num)
+  if (Number.isInteger(number)) {
+    return num.toString();
+  }
+  const numString = num.toString();
+  const decimalPos = numString.indexOf('.');
+  if (decimalPos === -1) {
+    return numString;
+  }
+  let firstSignificantDigitPos = decimalPos + 1;
+  while (numString[firstSignificantDigitPos] === '0') {
+    firstSignificantDigitPos++;
+  }
+  const decimalPlaces = firstSignificantDigitPos - decimalPos - 1 + 2;
+  return number.toFixed(decimalPlaces);
+}
+
 onMounted(() => {
   window.addEventListener('scroll', handleScroll);
   fetchPrices();
@@ -425,229 +528,3 @@ onUnmounted(() => {
   window.clearTimeout(priceTimeout);
 });
 </script>
-
-<style scoped>
-body {
-  font-family: Arial, sans-serif;
-  margin: 20px;
-}
-
-input {
-  margin-bottom: 10px;
-}
-
-.title {
-  margin-top: 65px;
-}
-
-.tool-box-container {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.resources-container {
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 20px;
-}
-
-.badge.ssm {
-  font-size: 12px;
-}
-
-.badge.sm {
-  font-size: 14px;
-}
-
-.tool-type {
-  max-width: 450px;
-  margin-right: 5px;
-  margin-bottom: 5px;
-}
-
-.tool-type h2 {
-  margin-top: 0;
-}
-
-.tool-box {
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 10px;
-  margin-bottom: 10px;
-  margin-right: 10px;
-  display: flex;
-}
-
-.tool-icon {
-  width: 64px;
-  height: 64px;
-  margin-right: 10px;
-}
-
-.tool-info {
-  flex-grow: 1;
-}
-
-.tool-name {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.tool-resource {
-  display: flex;
-  align-items: center;
-  margin-bottom: 5px;
-}
-
-.resource-icon {
-  width: 20px;
-  height: 20px;
-  margin-right: 5px;
-}
-
-.ton-icon {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  background-image: url('/img/ton_g.png');
-  background-size: cover;
-  vertical-align: middle;
-  margin: 0px 5px 5px 5px;
-}
-
-p {
-  margin: 0;
-}
-
-.red,
-#server-error {
-  color: red;
-}
-
-.navbar {
-  background-color: #000000a1;
-  -webkit-box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .16), 0 2px 10px 0 rgba(0, 0, 0, .12);
-  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .16), 0 2px 10px 0 rgba(0, 0, 0, .12)
-}
-
-.navbar:not(.top-nav-collapse) {
-  background: 0 0
-}
-
-table.table.mwm th,
-table.table.mwm td {
-  padding: 2px;
-}
-
-.mwm .wam_id {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: 90px;
-  white-space: nowrap;
-}
-
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: #000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-dialog {
-  max-width: 500px;
-  width: 100%;
-  margin: 1.75rem auto;
-}
-
-.modal-content {
-  background-color: #fff;
-  border-radius: 0.3rem;
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.modal-title {
-  margin-bottom: 0;
-}
-
-.modal-body {
-  padding: 1rem;
-}
-
-.modal-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 1rem;
-  border-top: 1px solid #dee2e6;
-}
-
-.nav-link.active {
-  background-color: #e0e0e0;
-}
-
-.flag-icon {
-  width: 30px;
-  height: 20px;
-}
-
-.footer {
-  background-color: #212121;
-  padding: 20px 0;
-  color: #fff;
-  width: 100%;
-  position: relative;
-  overflow: hidden;
-}
-
-.ton-address {
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-.copied-message {
-  position: absolute;
-  bottom: 15px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 14px;
-  opacity: 0;
-  animation: fade-in-out 2s ease-in-out;
-}
-
-@keyframes fade-in-out {
-  0% {
-    opacity: 0;
-  }
-
-  20% {
-    opacity: 1;
-  }
-
-  80% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-</style>
