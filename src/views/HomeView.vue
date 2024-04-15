@@ -523,9 +523,9 @@ const tonPriceUsd = ref<number | string>(0);
 
 async function fetchTonPrice() {
   try {
-    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd');
+    const response = await fetch('https://tonapi.io/v2/rates?tokens=ton&currencies=usd');
     const data = await response.json();
-    tonPriceUsd.value = data['the-open-network'].usd;
+    tonPriceUsd.value = data?.rates?.TON?.prices?.USD || 'err';
     priceTonTimeout = setInterval(fetchTonPrice, 5 * 60 * 1000);
   } catch (error) {
     console.error('Ошибка получения цены TON Coin:', error);
