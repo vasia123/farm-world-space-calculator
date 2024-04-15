@@ -521,14 +521,26 @@ function formatNumber(num: number | string): string {
 }
 const tonPriceUsd = ref<number | string>(0);
 
+function saveTonPrice(price: number | string) {
+  localStorage.setItem('tonPrice', JSON.stringify(price));
+}
+function loadTonPrice(): number | string | null {
+  const storedPrice = localStorage.getItem('tonPrice');
+  if (storedPrice) {
+    return JSON.parse(storedPrice);
+  }
+  return null;
+}
 async function fetchTonPrice() {
   try {
     const response = await fetch('https://tonapi.io/v2/rates?tokens=ton&currencies=usd');
     const data = await response.json();
-    tonPriceUsd.value = data?.rates?.TON?.prices?.USD || 'err';
+    const price = data?.rates?.TON?.prices?.USD || 'err';
+    tonPriceUsd.value = price;
+    saveTonPrice(price);
   } catch (error) {
     console.error('Ошибка получения цены TON Coin:', error);
-    tonPriceUsd.value = 'err'
+    tonPriceUsd.value = 'err';
   }
   priceTonTimeout = setInterval(fetchTonPrice, 5 * 60 * 1000);
 }
@@ -541,7 +553,13 @@ onMounted(() => {
   if (savedLanguage) {
     locale.value = savedLanguage;
   }
-  fetchTonPrice();
+  const storedTonPrice = loadTonPrice();
+  if (storedTonPrice) {
+    tonPriceUsd.value = storedTonPrice;
+    priceTonTimeout = setInterval(fetchTonPrice, 5 * 60 * 1000);
+  } else {
+    fetchTonPrice();
+  }
 });
 
 onUnmounted(() => {
