@@ -522,14 +522,11 @@ function formatNumber(num: number | string): string {
 const tonPriceUsd = ref<number | string>(0);
 
 function saveTonPrice(price: number | string) {
-  localStorage.setItem('tonPrice', JSON.stringify(price));
+  localStorage.setItem('tonPrice', price.toString());
 }
 function loadTonPrice(): number | string | null {
   const storedPrice = localStorage.getItem('tonPrice');
-  if (storedPrice) {
-    return JSON.parse(storedPrice);
-  }
-  return null;
+  return storedPrice ? storedPrice : null;
 }
 async function fetchTonPrice() {
   try {
@@ -554,7 +551,7 @@ onMounted(() => {
     locale.value = savedLanguage;
   }
   const storedTonPrice = loadTonPrice();
-  if (storedTonPrice) {
+  if (storedTonPrice || storedTonPrice === 'err') {
     tonPriceUsd.value = storedTonPrice;
     priceTonTimeout = setInterval(fetchTonPrice, 5 * 60 * 1000);
   } else {
