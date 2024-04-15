@@ -526,11 +526,11 @@ async function fetchTonPrice() {
     const response = await fetch('https://tonapi.io/v2/rates?tokens=ton&currencies=usd');
     const data = await response.json();
     tonPriceUsd.value = data?.rates?.TON?.prices?.USD || 'err';
-    priceTonTimeout = setInterval(fetchTonPrice, 5 * 60 * 1000);
   } catch (error) {
     console.error('Ошибка получения цены TON Coin:', error);
     tonPriceUsd.value = 'err'
   }
+  priceTonTimeout = setInterval(fetchTonPrice, 5 * 60 * 1000);
 }
 
 onMounted(() => {
