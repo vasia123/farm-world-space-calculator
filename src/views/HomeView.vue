@@ -551,7 +551,7 @@ onMounted(() => {
     locale.value = savedLanguage;
   }
   const storedTonPrice = loadTonPrice();
-  if (storedTonPrice || storedTonPrice === 'err') {
+  if (storedTonPrice && storedTonPrice !== '"err"') {
     tonPriceUsd.value = storedTonPrice;
     priceTonTimeout = setInterval(fetchTonPrice, 5 * 60 * 1000);
   } else {
