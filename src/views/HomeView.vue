@@ -563,7 +563,7 @@ async function fetchTonPrice() {
   priceTonTimeout = setInterval(fetchTonPrice, 5 * 60 * 1000);
 }
 function getUserToolsROI(): number {
-  const totalProfit = getUserToolsProfitSummary();
+  const totalProfit = getUserToolsProfitSummary() || 1;
   const totalInvestment = userTools.value.reduce((sum, tool) => sum + tool.craftPrice, 0);
   return totalInvestment / totalProfit;
 }
