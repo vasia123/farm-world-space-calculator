@@ -112,7 +112,7 @@
                   {{ formatNumber(getUserToolsProfitSummary()) }} <i class="ton-icon"></i>
                 </td>
                 <td>
-                  {{ $t('roi') }}: <span class="badge grey darken-2 sm ml-1">{{ getUserToolsROI().toFixed(1) }}</span>
+                  {{ $t('roi') }}: <span class="badge grey darken-2 sm ml-1">{{ getUserToolsROI()?.toFixed(1) }}</span>
                   дней
                 </td>
               </tr>
@@ -524,7 +524,7 @@ function getUserToolsProfitSummary() {
 function formatNumber(num: number | string): string {
   const number = Number(num)
   if (Number.isInteger(number)) {
-    return num.toString();
+    return String(num);
   }
   const numString = num.toString();
   const decimalPos = numString.indexOf('.');
@@ -563,7 +563,8 @@ async function fetchTonPrice() {
   priceTonTimeout = setInterval(fetchTonPrice, 5 * 60 * 1000);
 }
 function getUserToolsROI(): number {
-  const totalProfit = getUserToolsProfitSummary() || 1;
+  const totalProfit = getUserToolsProfitSummary();
+  if (totalProfit === 0) return 0;
   const totalInvestment = userTools.value.reduce((sum, tool) => sum + tool.craftPrice, 0);
   return totalInvestment / totalProfit;
 }
