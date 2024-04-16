@@ -1,21 +1,23 @@
 <template>
-  <div class="grey darken-3 px-3 py-1">
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top scrolling-navbar py-1">
-      <div class="alert alert-light p-1 m-0 mr-1 fw_topBox token_TON" style="">
-        <img class="mr-1" src="/img/ton_g.png">
-        <strong>{{ formatNumber(tonPriceUsd) }}$</strong>
-      </div>
-      <div class="alert alert-light p-1 m-0 mr-1 fw_topBox token_FWW" style="">
-        <img class="mr-1" src="/img/wood_shadow.png">
-        <strong>{{ formatNumber(prices.wood) }}</strong>
-      </div>
-      <div class="alert alert-light p-1 m-0 mr-1 fw_topBox token_FWF" style="">
-        <img class="mr-1" src="/img/food_shadow.png">
-        <strong>{{ formatNumber(prices.food) }}</strong>
-      </div>
-      <div class="alert alert-light p-1 m-0 fw_topBox token_FWG" style="">
-        <img class="mr-1" src="/img/gold_shadow.png">
-        <strong>{{ formatNumber(prices.gold) }}</strong>
+  <div class="page-outer">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top scrolling-navbar">
+      <div class="navbar-prices">
+        <div class="alert alert-light p-1 fw_topBox token_TON" style="">
+          <img class="mr-1" src="/img/ton_g.png">
+          <strong>{{ formatNumber(tonPriceUsd) }}$</strong>
+        </div>
+        <div class="alert alert-light p-1 fw_topBox token_FWW" style="">
+          <img class="mr-1" src="/img/wood_shadow.png">
+          <strong>{{ formatNumber(prices.wood) }}</strong>
+        </div>
+        <div class="alert alert-light p-1 fw_topBox token_FWF" style="">
+          <img class="mr-1" src="/img/food_shadow.png">
+          <strong>{{ formatNumber(prices.food) }}</strong>
+        </div>
+        <div class="alert alert-light p-1 fw_topBox token_FWG" style="">
+          <img class="mr-1" src="/img/gold_shadow.png">
+          <strong>{{ formatNumber(prices.gold) }}</strong>
+        </div>
       </div>
       <ul class="nav navbar-nav nav-flex-icons ml-auto">
         <li class="nav-item">
@@ -64,45 +66,65 @@
       <div v-if="serverError" class="red">{{ serverError }}</div>
     </div>
 
-    <div v-if="userTools.length > 0">
-      <div class="tool-box-container">
-        <div v-for="(tool, index) in userTools" :key="index" class="tool-box">
-          <img :src="tool.icon" :alt="tool.name" class="mr-2" width="20px" height="20px">
-          <div class="tool-info">
-            <span class="mr-2">
-              {{ $t('dailyProfit') }}:
-            </span>
-            <span class="mr-2">
-              {{ formatNumber(tool.profit * 24) }}
-              <img :src="'/farm-world-space-calculator/img/' + String(tool.resource).toLowerCase() + '_shadow.png'"
-                width="20px" height="20px" class="mb-1" />
-            </span>
-            <span>
-              {{ formatNumber(getToolDailyProfit(tool)) }} <i class="ton-icon"></i>
-            </span>
+    <div class="mb-4 tool-box-container">
+      <div class="card card-cascade wider">
+        <div class="view view-cascade grey darken-3">
+          <div class="text-center my-3">{{ $t('myTools') }}</div>
+          <div class="no-tools" v-if="userTools.length == 0">
+            {{ $t('noToolsAdded') }}<br>{{ $t('addToolsInSettings') }}
+          </div>
+          <div v-else class="tools-tables">
+            <table class="tools-table">
+              <tr>
+                <th>&nbsp;</th>
+                <th>{{ $t('production') }}</th>
+                <th>{{ $t('income') }}</th>
+                <th>{{ $t('invested') }}</th>
+              </tr>
+              <tr v-for="(tool, index) in userTools" :key="index" class="tool-row">
+                <td>
+                  <img :src="tool.icon" :alt="tool.name" class="mr-2" width="20px" height="20px">
+                </td>
+                <td>
+                  {{ formatNumber(tool.profit * 24) }}
+                  <img :src="'/farm-world-space-calculator/img/' + String(tool.resource).toLowerCase() + '_shadow.png'"
+                    width="20px" height="20px" class="mb-1" />
+                </td>
+                <td>
+                  {{ formatNumber(getToolDailyProfit(tool)) }} <i class="ton-icon"></i>
+                </td>
+                <td>
+                  {{ tool.craftPrice }} <i class="ton-icon"></i>
+                </td>
+              </tr>
+              <tr class="tool-row">
+                <td>
+                  {{ $t('dailyProfit') }}:
+                </td>
+                <td>
+                  <div v-for="(amount, resource) in getUserToolsResourceSummary()" :key="resource">
+                    {{ formatNumber(amount) }}
+                    <img :src="'/farm-world-space-calculator/img/' + resource + '_shadow.png'" width="20px"
+                      height="20px" class="mb-1" />
+                  </div>
+                </td>
+                <td>
+                  {{ formatNumber(getUserToolsProfitSummary()) }} <i class="ton-icon"></i>
+                </td>
+                <td>
+                  {{ $t('roi') }}: <span class="badge grey darken-2 sm ml-1">{{ getUserToolsROI().toFixed(1) }}</span>
+                  дней
+                </td>
+              </tr>
+            </table>
           </div>
         </div>
-      </div>
-      <div class="mt-2">
-        <p>
-          <span class="mr-3">
-            {{ $t('dailyProfitFull') }}:
-          </span>
-          <span v-for="(amount, resource) in getUserToolsResourceSummary()" :key="resource" class="mr-4">
-            {{ formatNumber(amount) }}
-            <img :src="'/farm-world-space-calculator/img/' + resource + '_shadow.png'" width="20px" height="20px"
-              class="mb-1" />
-          </span>
-          <span class="mr-3">
-            {{ formatNumber(getUserToolsProfitSummary()) }} <i class="ton-icon"></i>
-          </span>
-        </p>
       </div>
     </div>
 
     <div class="resources-container">
-      <div class="col-lg-4 col-md-6 col-sm-12 mb-4 px-2 text-center" v-for="(toolsOfType, resource) in toolTypes"
-        :key="resource">
+      <div class="col-lg-4 col-md-6 col-sm-12 mb-4 text-center resource-item"
+        v-for="(toolsOfType, resource) in toolTypes" :key="resource">
         <div class="card card-cascade wider">
           <div class="view view-cascade grey darken-3">
             <div class="m-1">
@@ -131,7 +153,7 @@
                       </span>
                     </div>
                     <div class="d-block mt-2">
-                      <span class="ml-3 badge sm no-shadow">ROI:</span>
+                      <span class="ml-3 badge sm no-shadow">{{ $t('roi') }}:</span>
                       <span class="badge grey darken-2 sm ml-1">
                         {{ getToolROI(tool, getToolCraftCost(tool)).days.toFixed(1) }}
                       </span>
@@ -519,7 +541,7 @@ function formatNumber(num: number | string): string {
   const decimalPlaces = firstSignificantDigitPos - decimalPos - 1 + 2;
   return number.toFixed(decimalPlaces);
 }
-const tonPriceUsd = ref<number | string>(0);
+const tonPriceUsd = ref<number | string>('...');
 
 function saveTonPrice(price: number | string) {
   localStorage.setItem('tonPrice', price.toString());
@@ -537,10 +559,15 @@ async function fetchTonPrice() {
     saveTonPrice(price);
   } catch (error) {
     console.error('Ошибка получения цены TON Coin:', error);
-    tonPriceUsd.value = 'err';
   }
   priceTonTimeout = setInterval(fetchTonPrice, 5 * 60 * 1000);
 }
+function getUserToolsROI(): number {
+  const totalProfit = getUserToolsProfitSummary();
+  const totalInvestment = userTools.value.reduce((sum, tool) => sum + tool.craftPrice, 0);
+  return totalInvestment / totalProfit;
+}
+
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll);

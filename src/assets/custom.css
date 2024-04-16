@@ -1,6 +1,10 @@
 body {
   font-family: Arial, sans-serif;
   padding-top: 85px;
+  background-color: #616161;
+}
+.page-outer {
+  padding: 0 10px;
 }
 
 input {
@@ -26,17 +30,71 @@ a,
   font-size: 24px;
   margin-bottom: 0;
   padding-bottom: 15px;
+  text-align: center;
+}
+.navbar {
+  padding: 5px 10px;
+  display: flex;
+  flex-wrap: nowrap;
+}
+.navbar-prices {
+  /* display: flex;
+  flex-wrap: wrap;
+  flex-grow: 1; */
+}
+/* @media (max-width: 500px) {
+  .navbar-prices {
+    max-width: 50%;
+  }
+} */
+.navbar-nav {
+  display: flex;
+  flex-wrap: nowrap;
+}
+.fw_topBox {
+  margin: 0 3px 3px 0;
+  white-space: nowrap;
+  display: inline-block;
+  min-width: 75px;
+}
+.navbar-nav button {
+  margin: 0 6px;
+  padding: 8px 6px;
+}
+@media (max-width: 600px) {
+  .fw_topBox {
+    min-width: 70px;
+  }
+  .navbar .nav-item .nav-link {
+    width: 37px;
+    padding: 6px 0;
+    margin: 0;
+  }
+  .navbar-nav button svg {
+    width: 25px;
+  }
 }
 
 .tool-box-container {
   display: flex;
   flex-wrap: wrap;
 }
+@media (max-width: 600px) {
+  .tool-box-container {
+    display: block;
+  }
+}
 
 .resources-container {
   display: flex;
   flex-wrap: wrap;
-  margin-top: 20px;
+  margin: 20px -10px 0;
+}
+
+@media (min-width: 425px) {
+  .resource-item {
+    padding: 0 0.5rem;
+  }
 }
 
 .badge.ssm {
@@ -58,11 +116,6 @@ a,
 }
 
 .tool-box {
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 10px;
-  margin-bottom: 10px;
-  margin-right: 10px;
   display: flex;
 }
 
@@ -73,7 +126,11 @@ a,
 }
 
 .tool-info {
-  flex-grow: 1;
+  display: flex;
+}
+.tool-info span {
+  display: flex;
+  white-space: nowrap;
 }
 
 .tool-name {
@@ -86,6 +143,39 @@ a,
   display: flex;
   align-items: center;
   margin-bottom: 5px;
+}
+.no-tools {
+  font-size: 10px;
+  padding: 20px;
+}
+
+.tools-table {
+  width: 90%;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  font-size: 12px;
+  margin: 0 auto;
+  /* border-bottom: 1px solid #fff; */
+}
+@media (min-width: 600px) {
+  .tools-table {
+    min-width: 400px;
+  }
+}
+
+.tools-table img {
+  display: inline-block;
+}
+.tools-table td {
+  padding: 4px 0;
+}
+.tools-table th {
+  /* font-weight: 700; */
+  padding: 4px 0;
+}
+.tool-row {
+  border-top: 1px solid #fff;
 }
 
 .no-tools {
