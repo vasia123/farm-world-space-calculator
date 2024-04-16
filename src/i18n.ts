@@ -35,6 +35,7 @@ const i18n = createI18n({
             addToolsInSettings: "Add your tools in the settings.",
             production: "Production",
             income: "Income",
+            invested: "Invested",
             roi: "ROI",
         },
         ru: {

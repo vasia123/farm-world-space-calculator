@@ -112,7 +112,7 @@
                   {{ formatNumber(getUserToolsProfitSummary()) }} <i class="ton-icon"></i>
                 </td>
                 <td>
-                  {{ $t('roi') }}: <span class="badge grey darken-2 sm ml-1">{{ getUserToolsROI()?.toFixed(1) }}</span>
+                  {{ $t('roi') }}: <span class="badge grey darken-2 sm ml-1">{{ getUserToolsROI().toFixed(1) }}</span>
                   дней
                 </td>
               </tr>
