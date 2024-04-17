@@ -203,9 +203,9 @@ p {
   margin: 0;
 }
 
-.red,
-#server-error {
-  color: red;
+.server-error {
+  color: #fff;
+  text-align: center;
 }
 
 .navbar {

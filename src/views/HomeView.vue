@@ -63,13 +63,13 @@
     </h1>
 
     <div v-if="state === 'server'">
-      <div v-if="serverError" class="red">{{ serverError }}</div>
+      <div v-if="serverError" class="server-error red mb-3">{{ $t('serverError') }}</div>
     </div>
 
     <div class="mb-4 tool-box-container">
       <div class="card card-cascade wider">
         <div class="view view-cascade grey darken-3">
-          <div class="text-center my-3">{{ $t('myTools') }}</div>
+          <div class="text-center my-3 font-weight-bolder">{{ $t('myTools') }}</div>
           <div class="no-tools" v-if="userTools.length == 0">
             {{ $t('noToolsAdded') }}<br>{{ $t('addToolsInSettings') }}
           </div>
@@ -350,7 +350,7 @@ const prices = reactive({
 
 const state = ref<'server' | 'local'>('server');
 const serverPrices = ref();
-const serverError = ref('');
+const serverError = ref(false);
 let priceTimeout: number;
 let priceTonTimeout: number;
 
@@ -420,7 +420,7 @@ function setState(stateName: 'local' | 'server') {
 }
 function fetchPrices() {
   setState('server');
-  serverError.value = '';
+  serverError.value = false;
 
   fetch('https://app.farm-world.space/tokens.php?access_token=FFGrIZyIsxIl17TaIxlBKHp7ZEZ55g')
     .then(response => response.json())
@@ -432,7 +432,8 @@ function fetchPrices() {
       priceTimeout = window.setTimeout(fetchPrices, 30 * 1000);
     })
     .catch(error => {
-      serverError.value = 'Ошибка получения цен: ' + error;
+      console.error(error)
+      serverError.value = true;
     });
 }
 

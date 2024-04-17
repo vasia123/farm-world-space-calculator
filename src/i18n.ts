@@ -37,6 +37,7 @@ const i18n = createI18n({
             income: "Income",
             invested: "Invested",
             roi: "ROI",
+            serverError: "The price server is unavailable. Manually enter the current prices in the settings.",
         },
         ru: {
             title: "Калькулятор окупаемости",
@@ -69,6 +70,7 @@ const i18n = createI18n({
             income: "Доход",
             invested: "Вложено",
             roi: "ROI",
+            serverError: "Сервер цен недоступен. Вручную введите актуальные цены в настройках.",
         },
     },
 });
