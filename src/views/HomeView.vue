@@ -161,19 +161,24 @@
                 <div class="d-inline-block w-50 b-atomic">
                   <div class="d-inline-block w-25 flex-right">
                     <img :src="tool.icon" :alt="tool.name" class="img-fluid ml-2">
-                    <!-- <span class="sss-font c-white">{{ tool.name }}</span> -->
                   </div>
                   <div class="d-inline-block w-75 flex-right vtop">
                     <div class="d-block">
                       <span class="badge sm no-shadow">{{ $t('dailyProfit') }}:</span>
-                      <span class="badge sm gradbg-lime2 ml-1">
+                      <span class="badge sm  ml-1" :class="{
+            'gradbg-lime2': getToolDailyProfit(tool) > 0,
+            'gradbg-red': getToolDailyProfit(tool) < 0,
+          }">
                         {{ formatNumber(getToolDailyProfit(tool)) }}<i class="ton-icon"></i>
                       </span>
                     </div>
                     <div class="d-block mt-2">
                       <span class="ml-3 badge sm no-shadow">{{ $t('roi') }}:</span>
                       <span class="badge grey darken-2 sm ml-1">
-                        {{ getToolROI(tool, getToolCraftCost(tool)).days.toFixed(1) }}
+                        {{ getToolDailyProfit(tool) > 0
+            ? getToolROI(tool, getToolCraftCost(tool)).days.toFixed(1)
+            : '🤷‍♂️'
+                        }}
                       </span>
                       {{ $t('days') }}
                     </div>
