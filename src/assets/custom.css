@@ -150,7 +150,7 @@ a,
 }
 
 .tools-table {
-  width: 90%;
+  width: 95%;
   color: #fff;
   text-align: center;
   white-space: nowrap;
@@ -169,13 +169,18 @@ a,
 }
 .tools-table td {
   padding: 4px 0;
+  font-size: 12px;
 }
 .tools-table th {
-  /* font-weight: 700; */
-  padding: 4px 0;
+  font-weight: 700;
+  padding: 4px 2px;
+  font-size: 12px;
 }
 .tool-row {
   border-top: 1px solid #fff;
+}
+.tool-costs-row {
+  height: 18px;
 }
 
 .no-tools {

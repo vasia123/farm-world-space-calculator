@@ -67,7 +67,7 @@
     <div class="mb-4 tool-box-container">
       <div class="card card-cascade wider">
         <div class="view view-cascade grey darken-3">
-          <div class="text-center my-3 font-weight-bolder">{{ $t('myTools') }}</div>
+          <div class="text-center my-2 font-weight-bolder">{{ $t('myTools') }}</div>
           <div class="no-tools" v-if="userTools.length == 0">
             {{ $t('noToolsAdded') }}<br>{{ $t('addToolsInSettings') }}
           </div>
@@ -76,6 +76,7 @@
               <tr>
                 <th>&nbsp;</th>
                 <th>{{ $t('production') }}</th>
+                <th>{{ $t('consumption') }}</th>
                 <th>{{ $t('income') }}</th>
                 <th>{{ $t('invested') }}</th>
               </tr>
@@ -89,6 +90,16 @@
                     width="20px" height="20px" class="mb-1" />
                 </td>
                 <td>
+                  <div v-if="tool.energy > 0" class="tool-costs-row">
+                    {{ formatNumber(tool.energy / 5 * 24) }}
+                    <img src="/img/food_shadow.png" width="20px" height="20px" class="mb-1" />
+                  </div>
+                  <div v-if="tool.durability > 0" class="tool-costs-row">
+                    {{ formatNumber(tool.durability / 5 * 24) }}
+                    <img src="/img/gold_shadow.png" width="20px" height="20px" class="mb-1" />
+                  </div>
+                </td>
+                <td>
                   {{ formatNumber(getToolDailyProfit(tool)) }} <i class="ton-icon"></i>
                 </td>
                 <td>
@@ -100,7 +111,16 @@
                   {{ $t('dailyProfit') }}:
                 </td>
                 <td>
-                  <div v-for="(amount, resource) in getUserToolsResourceSummary()" :key="resource">
+                  <div v-for="(amount, resource) in getUserToolsResourceSummary()" :key="resource"
+                    class="tool-costs-row">
+                    {{ formatNumber(amount) }}
+                    <img :src="'/farm-world-space-calculator/img/' + resource + '_shadow.png'" width="20px"
+                      height="20px" class="mb-1" />
+                  </div>
+                </td>
+                <td>
+                  <div v-for="(amount, resource) in getUserToolsConsumptionSummary()" :key="resource"
+                    class="tool-costs-row">
                     {{ formatNumber(amount) }}
                     <img :src="'/farm-world-space-calculator/img/' + resource + '_shadow.png'" width="20px"
                       height="20px" class="mb-1" />
@@ -519,6 +539,19 @@ function getUserToolsResourceSummary(): Record<string, number> {
 
 function getUserToolsProfitSummary() {
   return userTools.value.reduce((sum, tool) => sum + getToolDailyProfit(tool), 0);
+}
+function getUserToolsConsumptionSummary(): Record<string, number> {
+  const consumptionSummary: Record<string, number> = {
+    food: 0,
+    gold: 0
+  };
+
+  userTools.value.forEach(tool => {
+    consumptionSummary.food += tool.energy / tool.cooldown * 24 / 5;
+    consumptionSummary.gold += tool.durability / tool.cooldown * 24 / 5;
+  });
+
+  return consumptionSummary;
 }
 
 function formatNumber(num: number | string): string {
