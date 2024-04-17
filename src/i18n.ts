@@ -37,7 +37,7 @@ const i18n = createI18n({
             income: "Income",
             invested: "Invested",
             roi: "ROI",
-            serverError: "The price server is unavailable. Manually enter the current prices in the settings.",
+            serverError: "The prices from server is unavailable. Manually enter the current prices in the settings.",
         },
         ru: {
             title: "Калькулятор окупаемости",

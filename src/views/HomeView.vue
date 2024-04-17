@@ -62,9 +62,7 @@
       </a>
     </h1>
 
-    <div v-if="state === 'server'">
-      <div v-if="serverError" class="server-error red mb-3">{{ $t('serverError') }}</div>
-    </div>
+    <div v-if="serverError" class="server-error red mb-3">{{ $t('serverError') }}</div>
 
     <div class="mb-4 tool-box-container">
       <div class="card card-cascade wider">
@@ -434,6 +432,7 @@ function fetchPrices() {
     .catch(error => {
       console.error(error)
       serverError.value = true;
+      state.value = 'local';
     });
 }
 
