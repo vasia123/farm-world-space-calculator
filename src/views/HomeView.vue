@@ -341,9 +341,9 @@ const tools: Tool[] = [
 ];
 
 const prices = reactive({
-  wood: 0.006,
-  food: 0.005,
-  gold: 0.007
+  wood: 0.0072,
+  food: 0.0069,
+  gold: 0.0095
 });
 
 const state = ref<'server' | 'local'>('server');
