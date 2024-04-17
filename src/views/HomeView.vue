@@ -91,11 +91,11 @@
                 </td>
                 <td>
                   <div v-if="tool.energy > 0" class="tool-costs-row">
-                    {{ formatNumber(tool.energy / 5 * 24) }}
+                    {{ formatNumber(tool.energy / tool.cooldown / 5 * 24) }}
                     <img src="/img/food_shadow.png" width="20px" height="20px" class="mb-1" />
                   </div>
                   <div v-if="tool.durability > 0" class="tool-costs-row">
-                    {{ formatNumber(tool.durability / 5 * 24) }}
+                    {{ formatNumber(tool.durability / tool.cooldown / 5 * 24) }}
                     <img src="/img/gold_shadow.png" width="20px" height="20px" class="mb-1" />
                   </div>
                 </td>
