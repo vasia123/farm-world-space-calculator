@@ -778,13 +778,13 @@ function getUserToolsROI(accountId: number): number {
 
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll);
-  fetchPrices();
-  loadAccounts();
   const savedLanguage = localStorage.getItem('selectedLanguage');
   if (savedLanguage) {
     locale.value = savedLanguage;
   }
+  window.addEventListener('scroll', handleScroll);
+  fetchPrices();
+  loadAccounts();
   const storedTonPrice = loadTonPrice();
   if (storedTonPrice && !['err', '"err"'].includes(storedTonPrice.toString())) {
     tonPriceUsd.value = storedTonPrice;
