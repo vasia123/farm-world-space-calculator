@@ -607,18 +607,16 @@ function loadAccounts() {
     accounts.value = JSON.parse(storedAccounts);
   } else {
     const storedTools = localStorage.getItem('userTools');
-    if (storedTools) {
-      accounts.value = [
-        {
-          id: 1,
-          name: $t('myAccount'),
-          tools: JSON.parse(storedTools),
-          editing: false
-        }
-      ];
-      saveAccounts();
-      localStorage.removeItem('userTools');
-    }
+    accounts.value = [
+      {
+        id: 1,
+        name: $t('myAccount'),
+        tools: storedTools ? JSON.parse(storedTools) : [],
+        editing: false
+      }
+    ];
+    saveAccounts();
+    localStorage.removeItem('userTools');
   }
 }
 
