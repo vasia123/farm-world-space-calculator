@@ -82,13 +82,21 @@ a,
 @media (max-width: 600px) {
   .tool-box-container {
     display: block;
+    width: 95%;
+    margin: 0 auto;
+  }
+}
+@media (max-width: 400px) {
+  .tool-box-container {
+    width: 98%;
   }
 }
 
-.resources-container {
+.resources-container,
+.tool-box-wrapper {
   display: flex;
   flex-wrap: wrap;
-  margin: 20px -10px 0;
+  margin: 0 -10px 0;
 }
 
 @media (min-width: 425px) {
@@ -134,9 +142,9 @@ a,
 }
 
 .tool-name {
-  font-size: 18px;
+  font-size: 12px;
   font-weight: bold;
-  margin-bottom: 5px;
+  flex-grow: 1;
 }
 
 .tool-resource {
@@ -178,6 +186,9 @@ a,
 }
 .tool-row {
   border-top: 1px solid #fff;
+}
+.tool-row:first-of-type {
+  border-top: none;
 }
 .tool-costs-row {
   height: 18px;
@@ -421,4 +432,126 @@ table.table.mwm td {
   100% {
     opacity: 0;
   }
+}
+
+.accounts-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.account-item {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+  padding: 16px;
+}
+
+.account-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.account-actions {
+  display: flex;
+  align-items: center;
+}
+
+.remove-account-button {
+  background-color: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  margin-left: 8px;
+  outline: none;
+}
+
+.remove-account-button:hover {
+  color: #000;
+}
+
+.account-tools {
+  margin-top: 16px;
+}
+
+.no-tools {
+  color: #888;
+  font-style: italic;
+}
+
+.tools-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.tool-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.tool-icon {
+  width: 15px;
+  height: 15px;
+  margin-right: 8px;
+}
+.remove-tool-button {
+  background-color: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  outline: none;
+}
+
+.remove-tool-button:hover {
+  color: #000;
+}
+
+.account-name {
+  text-align: center;
+}
+
+.account-name span {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.account-name-input {
+  font-size: 18px;
+  font-weight: bold;
+  background-color: transparent;
+  outline: none;
+  padding: 4px;
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.edit-account-button {
+  background-color: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  margin-left: 8px;
+  outline: none;
+}
+
+.edit-account-button:hover {
+  color: #000;
+}
+
+.add-tool-button {
+  margin-top: 16px;
+  padding: 8px;
+  width: 100%;
+  color: #fff;
+}
+
+.add-tool-button:hover {
+  background-color: #eee;
+}
+
+.add-tool-button i {
+  margin-right: 4px;
 }

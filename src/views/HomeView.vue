@@ -64,77 +64,106 @@
 
     <div v-if="serverError" class="server-error red mb-3">{{ $t('serverError') }}</div>
 
-    <div class="mb-4 tool-box-container">
-      <div class="card card-cascade wider">
-        <div class="view view-cascade grey darken-3">
-          <div class="text-center my-2 font-weight-bolder">{{ $t('myTools') }}</div>
-          <div class="no-tools" v-if="userTools.length == 0">
-            {{ $t('noToolsAdded') }}<br>{{ $t('addToolsInSettings') }}
+    <div class="tool-box-wrapper">
+      <div v-for="account in accounts" :key="account.id" class="mb-3 px-1 tool-box-container">
+        <div class="card card-cascade wider">
+          <div class="view view-cascade grey darken-3">
+            <div class="text-center my-2 font-weight-bolder">
+              {{ account.name }}
+            </div>
+            <div class="no-tools" v-if="account.tools.length == 0">
+              {{ $t('noToolsAdded') }}<br>{{ $t('addToolsInSettings') }}
+            </div>
+            <div v-else class="tools-tables mb-2">
+              <table class="tools-table">
+                <tr>
+                  <th>&nbsp;</th>
+                  <th>{{ $t('production') }}</th>
+                  <th>{{ $t('consumption') }}</th>
+                  <th>{{ $t('income') }}</th>
+                  <th>{{ $t('invested') }}</th>
+                </tr>
+                <tr v-for="(tool, index) in account.tools" :key="index" class="tool-row">
+                  <td>
+                    <img :src="tool.icon" :alt="tool.name" class="mr-2" width="20px" height="20px">
+                  </td>
+                  <td>
+                    {{ formatNumber(tool.profit * 24) }}
+                    <img
+                      :src="'/farm-world-space-calculator/img/' + String(tool.resource).toLowerCase() + '_shadow.png'"
+                      width="20px" height="20px" class="mb-1" />
+                  </td>
+                  <td>
+                    <div v-if="tool.energy > 0" class="tool-costs-row">
+                      {{ formatNumber(tool.energy / 5 * 24) }}
+                      <img src="/img/food_shadow.png" width="20px" height="20px" class="mb-1" />
+                    </div>
+                    <div v-if="tool.durability > 0" class="tool-costs-row">
+                      {{ formatNumber(tool.durability / 5 * 24) }}
+                      <img src="/img/gold_shadow.png" width="20px" height="20px" class="mb-1" />
+                    </div>
+                  </td>
+                  <td>
+                    {{ formatNumber(getToolDailyProfit(tool)) }} <i class="ton-icon"></i>
+                  </td>
+                  <td>
+                    {{ tool.craftPrice }} <i class="ton-icon"></i>
+                  </td>
+                </tr>
+                <tr class="tool-row">
+                  <td>
+                    {{ $t('dailyProfit') }}:
+                  </td>
+                  <td>
+                    <div v-for="(amount, resource) in getAccountToolsResourceSummary(account.id)" :key="resource"
+                      class="tool-costs-row">
+                      {{ formatNumber(amount) }}
+                      <img :src="'/farm-world-space-calculator/img/' + resource + '_shadow.png'" width="20px"
+                        height="20px" class="mb-1" />
+                    </div>
+                  </td>
+                  <td>
+                    <div v-for="(amount, resource) in getAccountToolsConsumptionSummary(account.id)" :key="resource"
+                      class="tool-costs-row">
+                      {{ formatNumber(amount) }}
+                      <img :src="'/farm-world-space-calculator/img/' + resource + '_shadow.png'" width="20px"
+                        height="20px" class="mb-1" />
+                    </div>
+                  </td>
+                  <td>
+                    {{ formatNumber(getAccountToolsProfitSummary(account.id)) }} <i class="ton-icon"></i>
+                  </td>
+                  <td>
+                    {{ $t('roi') }}: <span class="badge grey darken-2 sm ml-1">{{ getUserToolsROI(account.id).toFixed(1)
+                      }}</span>
+                    {{ $t('days') }}
+                  </td>
+                </tr>
+              </table>
+            </div>
           </div>
-          <div v-else class="tools-tables">
-            <table class="tools-table">
-              <tr>
-                <th>&nbsp;</th>
-                <th>{{ $t('production') }}</th>
-                <th>{{ $t('consumption') }}</th>
-                <th>{{ $t('income') }}</th>
-                <th>{{ $t('invested') }}</th>
-              </tr>
-              <tr v-for="(tool, index) in userTools" :key="index" class="tool-row">
-                <td>
-                  <img :src="tool.icon" :alt="tool.name" class="mr-2" width="20px" height="20px">
-                </td>
-                <td>
-                  {{ formatNumber(tool.profit * 24) }}
-                  <img :src="'/farm-world-space-calculator/img/' + String(tool.resource).toLowerCase() + '_shadow.png'"
-                    width="20px" height="20px" class="mb-1" />
-                </td>
-                <td>
-                  <div v-if="tool.energy > 0" class="tool-costs-row">
-                    {{ formatNumber(tool.energy / tool.cooldown / 5 * 24) }}
-                    <img src="/img/food_shadow.png" width="20px" height="20px" class="mb-1" />
-                  </div>
-                  <div v-if="tool.durability > 0" class="tool-costs-row">
-                    {{ formatNumber(tool.durability / tool.cooldown / 5 * 24) }}
-                    <img src="/img/gold_shadow.png" width="20px" height="20px" class="mb-1" />
-                  </div>
-                </td>
-                <td>
-                  {{ formatNumber(getToolDailyProfit(tool)) }} <i class="ton-icon"></i>
-                </td>
-                <td>
-                  {{ tool.craftPrice }} <i class="ton-icon"></i>
-                </td>
-              </tr>
-              <tr class="tool-row">
-                <td>
-                  {{ $t('dailyProfit') }}:
-                </td>
-                <td>
-                  <div v-for="(amount, resource) in getUserToolsResourceSummary()" :key="resource"
-                    class="tool-costs-row">
-                    {{ formatNumber(amount) }}
-                    <img :src="'/farm-world-space-calculator/img/' + resource + '_shadow.png'" width="20px"
-                      height="20px" class="mb-1" />
-                  </div>
-                </td>
-                <td>
-                  <div v-for="(amount, resource) in getUserToolsConsumptionSummary()" :key="resource"
-                    class="tool-costs-row">
-                    {{ formatNumber(amount) }}
-                    <img :src="'/farm-world-space-calculator/img/' + resource + '_shadow.png'" width="20px"
-                      height="20px" class="mb-1" />
-                  </div>
-                </td>
-                <td>
-                  {{ formatNumber(getUserToolsProfitSummary()) }} <i class="ton-icon"></i>
-                </td>
-                <td>
-                  {{ $t('roi') }}: <span class="badge grey darken-2 sm ml-1">{{ getUserToolsROI().toFixed(1) }}</span>
-                  дней
-                </td>
-              </tr>
-            </table>
+        </div>
+      </div>
+      <div class="mb-3 px-1 tool-box-container" v-if="accounts.length > 1">
+        <div class="card card-cascade wider">
+          <div class="view view-cascade grey darken-3">
+            <div class="text-center my-2 font-weight-bolder">
+              {{ $t('fullDailyProfit') }}
+            </div>
+            <div class="tools-tables p-2">
+              <table class="tools-table">
+                <tr class="tool-row">
+                  <td>
+                    {{ formatNumber(getAllToolsProfitSummary()) }} <i class="ton-icon"></i>
+                  </td>
+                  <td>
+                    {{ $t('roi') }}: <span class="badge grey darken-2 sm ml-1">{{ getAllToolsROI().toFixed(1)
+                      }}</span>
+                    {{ $t('days') }}
+                  </td>
+                </tr>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -284,30 +313,55 @@
           <input type="number" id="goldPrice" v-model.number="prices.gold" step="0.0001"><br>
         </div>
       </div>
-      <button v-if="state === 'server'" @click="setManualPrices" class="btn btn-light">{{ $t('manualPrices')
-        }}</button>
+      <button v-if="state === 'server'" @click="setManualPrices" class="btn btn-light">{{ $t('manualPrices') }}</button>
       <button v-if="state === 'local'" @click="fetchPrices" class="btn btn-primary">{{ $t('fetchPrices') }}</button>
-      <h5 class="my-4">{{ $t('addedTools') }}</h5>
-      <div v-if="userTools.length > 0">
-        <ul class="user-tools-list">
-          <li v-for="(tool, index) in userTools" :key="index">
-            <img :src="tool.icon" :alt="tool.name" class="small" width="20px" height="20px">
-            {{ tool.name }}
-            <button @click="removeUserTool(index)" class="remove-tool-button">
-              <svg xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision"
-                text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd"
-                clip-rule="evenodd" viewBox="0 0 456 511.82" width="15" height="15">
-                <path fill="#FD3B3B"
-                  d="M48.42 140.13h361.99c17.36 0 29.82 9.78 28.08 28.17l-30.73 317.1c-1.23 13.36-8.99 26.42-25.3 26.42H76.34c-13.63-.73-23.74-9.75-25.09-24.14L20.79 168.99c-1.74-18.38 9.75-28.86 27.63-28.86zM24.49 38.15h136.47V28.1c0-15.94 10.2-28.1 27.02-28.1h81.28c17.3 0 27.65 11.77 27.65 28.01v10.14h138.66c.57 0 1.11.07 1.68.13 10.23.93 18.15 9.02 18.69 19.22.03.79.06 1.39.06 2.17v42.76c0 5.99-4.73 10.89-10.62 11.19-.54 0-1.09.03-1.63.03H11.22c-5.92 0-10.77-4.6-11.19-10.38 0-.72-.03-1.47-.03-2.23v-39.5c0-10.93 4.21-20.71 16.82-23.02 2.53-.45 5.09-.37 7.67-.37zm83.78 208.38c-.51-10.17 8.21-18.83 19.53-19.31 11.31-.49 20.94 7.4 21.45 17.57l8.7 160.62c.51 10.18-8.22 18.84-19.53 19.32-11.32.48-20.94-7.4-21.46-17.57l-8.69-160.63zm201.7-1.74c.51-10.17 10.14-18.06 21.45-17.57 11.32.48 20.04 9.14 19.53 19.31l-8.66 160.63c-.52 10.17-10.14 18.05-21.46 17.57-11.31-.48-20.04-9.14-19.53-19.32l8.67-160.62zm-102.94.87c0-10.23 9.23-18.53 20.58-18.53 11.34 0 20.58 8.3 20.58 18.53v160.63c0 10.23-9.24 18.53-20.58 18.53-11.35 0-20.58-8.3-20.58-18.53V245.66z" />
-              </svg>
-            </button>
+
+      <h5 class="my-4">{{ $t('accounts') }}</h5>
+      <div v-if="accounts.length > 0">
+        <ul class="accounts-list">
+          <li v-for="account in accounts" :key="account.id" class="account-item">
+            <div class="account-info">
+              <div class="account-actions" v-if="!account.editing && accounts.length > 1">
+                <button @click="removeAccount(account.id)" class="remove-account-button">
+                  <TrashIcon />
+                </button>
+              </div>
+              <div class="account-name">
+                <span v-if="!account.editing">{{ account.name }}</span>
+                <input v-else type="text" v-model="account.name" @keyup.enter="saveAccountName(account)"
+                  class="account-name-input">
+              </div>
+              <div class="account-actions">
+                <button @click="account.editing = !account.editing" class="edit-account-button">
+                  <component :is="account.editing ? DoneIcon : PencilIcon"></component>
+                </button>
+              </div>
+            </div>
+            <div class="account-tools">
+              <div v-if="account.tools.length === 0" class="no-tools">
+                {{ $t('noToolsAdded') }}
+              </div>
+              <ul v-else class="tools-list">
+                <li v-for="(tool, index) in account.tools" :key="index" class="tool-item">
+                  <img :src="tool.icon" :alt="tool.name" class="tool-icon">
+                  <span class="tool-name">{{ tool.name }}<!-- - {{ tool.craftPrice }}<i class="ton-icon"></i>--></span>
+                  <button @click="removeUserTool(account.id, index)" class="remove-tool-button">
+                    <TrashIcon />
+                  </button>
+                </li>
+              </ul>
+              <button @click="openAddToolModal(account.id)" class="btn btn-info add-tool-button">
+                <AddIcon class="mr-2" />
+                {{ $t('addTool') }}
+              </button>
+            </div>
           </li>
         </ul>
       </div>
-      <div v-else class="no-tools mb-2">
-        {{ $t('noAddedTools') }}
+      <div v-else class="no-accounts mb-2">
+        {{ $t('noAccounts') }}
       </div>
-      <button @click="openAddToolModal" class="btn btn-secondary mt-2">{{ $t('addTool') }}</button>
+      <button @click="addAccount" class="btn btn-secondary mt-2">{{ $t('addAccount') }}</button>
     </div>
   </div>
 </template>
@@ -315,6 +369,13 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import TrashIcon from '@/components/trash-icon.vue'
+import PencilIcon from '@/components/pencil-icon.vue'
+import DoneIcon from '@/components/done-icon.vue'
+import AddIcon from '@/components/add-icon.vue'
+
+// TODO: система аккаунтов
+// TODO: калькулятор цены стаков
 
 const { locale, t: $t } = useI18n();
 
@@ -353,6 +414,14 @@ interface Tool {
 interface CraftedTool extends Tool {
   craftPrice: number;
 }
+interface Account {
+  id: number;
+  name: string;
+  tools: CraftedTool[];
+  editing: boolean;
+}
+
+const accounts = ref<Account[]>([]);
 
 const tools: Tool[] = [
   { name: 'Axe (Common)', icon: 'img/axe_common_shadow.png', profit: 5, wood: 2400, gold: 400, cooldown: 1, resource: 'wood', energy: 10, durability: 5, maxDurability: 100 },
@@ -481,11 +550,11 @@ function handleScroll() {
 const showAddToolModal = ref(false);
 const selectedTool = ref<Tool | null>(null);
 const craftPrice = ref(0);
-const userTools = ref<CraftedTool[]>([]);
 
-function openAddToolModal() {
+function openAddToolModal(account: number) {
   showAddToolModal.value = true;
   showSettingsMenu.value = false;
+  selectedAccountId.value = account;
   document.body.classList.add('modal-open');
 }
 
@@ -494,31 +563,76 @@ function closeAddToolModal() {
   document.body.classList.remove('modal-open');
   selectedTool.value = null;
   craftPrice.value = 0;
+  showSettingsMenu.value = true;
 }
+function saveAccountName(account: Account) {
+  account.editing = false;
+  saveAccounts();
+}
+const selectedAccountId = ref<number | null>(null);
 
 function addUserTool() {
-  if (!selectedTool.value) return;
+  if (!selectedTool.value || !selectedAccountId.value) return;
+  const account = accounts.value.find(acc => acc.id === selectedAccountId.value);
+  if (!account) return;
+
   const newTool = {
     ...selectedTool.value,
     craftPrice: craftPrice.value
   };
-  userTools.value.push(newTool);
+  account.tools.push(newTool);
   closeAddToolModal();
-  saveUserTools();
+  saveAccounts();
 }
 
-function saveUserTools() {
-  localStorage.setItem('userTools', JSON.stringify(userTools.value));
+function addAccount() {
+  const accNum = (accounts.value.length > 0) ? ` ${accounts.value.length + 1}` : ''
+  const newAccount: Account = {
+    id: Date.now(),
+    name: `${$t('myAccount')}${accNum}`,
+    tools: [],
+    editing: false
+  };
+  accounts.value.push(newAccount);
+  saveAccounts();
 }
-function loadUserTools() {
-  const storedTools = localStorage.getItem('userTools');
-  if (storedTools) {
-    userTools.value = JSON.parse(storedTools);
+
+function saveAccounts() {
+  localStorage.setItem('accounts', JSON.stringify(accounts.value));
+}
+
+function loadAccounts() {
+  const storedAccounts = localStorage.getItem('accounts');
+  if (storedAccounts) {
+    accounts.value = JSON.parse(storedAccounts);
+  } else {
+    const storedTools = localStorage.getItem('userTools');
+    if (storedTools) {
+      accounts.value = [
+        {
+          id: 1,
+          name: $t('myAccount'),
+          tools: JSON.parse(storedTools),
+          editing: false
+        }
+      ];
+      saveAccounts();
+      localStorage.removeItem('userTools');
+    }
   }
 }
-function removeUserTool(index: number) {
-  userTools.value.splice(index, 1);
-  saveUserTools();
+
+function removeUserTool(accountId: number, index: number) {
+  const account = accounts.value.find(acc => acc.id === accountId);
+  if (account) {
+    account.tools.splice(index, 1);
+    saveAccounts();
+  }
+}
+
+function removeAccount(accountId: number) {
+  accounts.value = accounts.value.filter(acc => acc.id !== accountId);
+  saveAccounts();
 }
 
 const showSettingsMenu = ref(false);
@@ -526,10 +640,13 @@ const showSettingsMenu = ref(false);
 function toggleSettingsMenu() {
   showSettingsMenu.value = !showSettingsMenu.value;
 }
-function getUserToolsResourceSummary(): Record<string, number> {
+function getAccountToolsResourceSummary(accountId: number): Record<string, number> {
+  const account = accounts.value.find(acc => acc.id === accountId);
+  if (!account) return {};
+
   const resourceSummary: Record<string, number> = {};
-  userTools.value.forEach(tool => {
-    const resource = tool.resource
+  account.tools.forEach(tool => {
+    const resource = tool.resource;
     const amount = tool.profit * 24;
     if (amount > 0) {
       if (resourceSummary[resource]) {
@@ -542,21 +659,70 @@ function getUserToolsResourceSummary(): Record<string, number> {
   return resourceSummary;
 }
 
-function getUserToolsProfitSummary() {
-  return userTools.value.reduce((sum, tool) => sum + getToolDailyProfit(tool), 0);
+function getAccountToolsProfitSummary(accountId: number): number {
+  const account = accounts.value.find(acc => acc.id === accountId);
+  if (!account) return 0;
+
+  return account.tools.reduce((sum, tool) => sum + getToolDailyProfit(tool), 0);
 }
-function getUserToolsConsumptionSummary(): Record<string, number> {
+function getAccountToolsConsumptionSummary(accountId: number): Record<string, number> {
+  const account = accounts.value.find(acc => acc.id === accountId);
+  if (!account) return { food: 0, gold: 0 };
+
   const consumptionSummary: Record<string, number> = {
     food: 0,
     gold: 0
   };
 
-  userTools.value.forEach(tool => {
+  account.tools.forEach(tool => {
     consumptionSummary.food += tool.energy / tool.cooldown * 24 / 5;
     consumptionSummary.gold += tool.durability / tool.cooldown * 24 / 5;
   });
 
   return consumptionSummary;
+}
+// function getAllToolsResourceSummary(): Record<string, number> {
+//   const resourceSummary: Record<string, number> = {};
+//   accounts.value.forEach(account => {
+//     account.tools.forEach(tool => {
+//       const resource = tool.resource;
+//       const amount = tool.profit * 24;
+//       if (amount > 0) {
+//         if (resourceSummary[resource]) {
+//           resourceSummary[resource] += amount;
+//         } else {
+//           resourceSummary[resource] = amount;
+//         }
+//       }
+//     });
+//   });
+//   return resourceSummary;
+// }
+
+function getAllToolsProfitSummary(): number {
+  return accounts.value.reduce((sum, account) => sum + account.tools.reduce((acc, tool) => acc + getToolDailyProfit(tool), 0), 0);
+}
+
+// function getAllToolsConsumptionSummary(): Record<string, number> {
+//   const consumptionSummary: Record<string, number> = {
+//     food: 0,
+//     gold: 0
+//   };
+
+//   accounts.value.forEach(account => {
+//     account.tools.forEach(tool => {
+//       consumptionSummary.food += tool.energy / tool.cooldown * 24 / 5;
+//       consumptionSummary.gold += tool.durability / tool.cooldown * 24 / 5;
+//     });
+//   });
+
+//   return consumptionSummary;
+// }
+function getAllToolsROI(): number {
+  const totalProfit = getAllToolsProfitSummary();
+  if (totalProfit === 0) return 0;
+  const totalInvestment = accounts.value.reduce((sum, account) => sum + account.tools.reduce((acc, tool) => acc + tool.craftPrice, 0), 0);
+  return totalInvestment / totalProfit;
 }
 
 function formatNumber(num: number | string): string {
@@ -600,10 +766,13 @@ async function fetchTonPrice() {
   }
   priceTonTimeout = setInterval(fetchTonPrice, 5 * 60 * 1000);
 }
-function getUserToolsROI(): number {
-  const totalProfit = getUserToolsProfitSummary();
+function getUserToolsROI(accountId: number): number {
+  const account = accounts.value.find(acc => acc.id === accountId);
+  if (!account) return 0;
+
+  const totalProfit = getAccountToolsProfitSummary(accountId);
   if (totalProfit === 0) return 0;
-  const totalInvestment = userTools.value.reduce((sum, tool) => sum + tool.craftPrice, 0);
+  const totalInvestment = account.tools.reduce((sum, tool) => sum + tool.craftPrice, 0);
   return totalInvestment / totalProfit;
 }
 
@@ -611,7 +780,7 @@ function getUserToolsROI(): number {
 onMounted(() => {
   window.addEventListener('scroll', handleScroll);
   fetchPrices();
-  loadUserTools();
+  loadAccounts();
   const savedLanguage = localStorage.getItem('selectedLanguage');
   if (savedLanguage) {
     locale.value = savedLanguage;
