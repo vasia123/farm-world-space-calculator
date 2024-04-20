@@ -18,6 +18,7 @@
           <img class="mr-1" src="/img/gold_shadow.png">
           <strong>{{ formatNumber(prices.gold) }}</strong>
         </div>
+        <button @click="openChartModal" class="btn btn-primary">{{ $t('showCharts') }}</button>
       </div>
       <ul class="nav navbar-nav nav-flex-icons ml-auto">
         <li class="nav-item">
@@ -364,15 +365,41 @@
       <button @click="addAccount" class="btn btn-secondary mt-2">{{ $t('addAccount') }}</button>
     </div>
   </div>
+
+  <div v-if="showChartModal" class="modal chart-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ $t('priceCharts') }}</h5>
+          <button type="button" class="close" @click="closeChartModal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div v-if="chartError && !chartPrices.length" class="alert alert-danger">{{ $t('chartError') }}</div>
+          <div v-else>
+            <div class="chart-container">
+              <PriceChart :chart-data="chartData" :chart-options="chartOptions" />
+            </div>
+            <div class="navigation">
+              <button @click="prevDay" :disabled="!hasPrevDay" class="btn btn-secondary">{{ $t('prevDay') }}</button>
+              <button @click="nextDay" :disabled="!hasNextDay" class="btn btn-secondary">{{ $t('nextDay') }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import TrashIcon from '@/components/trash-icon.vue'
-import PencilIcon from '@/components/pencil-icon.vue'
-import DoneIcon from '@/components/done-icon.vue'
-import AddIcon from '@/components/add-icon.vue'
+import TrashIcon from '@/components/icons/trash-icon.vue'
+import PencilIcon from '@/components/icons/pencil-icon.vue'
+import DoneIcon from '@/components/icons/done-icon.vue'
+import AddIcon from '@/components/icons/add-icon.vue'
+import PriceChart from '@/components/PriceChart.vue';
 
 // TODO: система аккаунтов
 // TODO: калькулятор цены стаков
@@ -773,6 +800,148 @@ function getUserToolsROI(accountId: number): number {
   const totalInvestment = account.tools.reduce((sum, tool) => sum + tool.craftPrice, 0);
   return totalInvestment / totalProfit;
 }
+
+const showChartModal = ref(false);
+const chartPrices = ref<{
+  FOOD: string
+  GOLD: string
+  WOOD: string
+  date_update: number
+}[]>([]);
+const chartError = ref(false);
+const currentDate = ref(new Date());
+
+async function openChartModal() {
+  showChartModal.value = true;
+  document.body.classList.add('modal-open');
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  currentDate.value = today;
+  const todayLoaded = await fetchChartPrices();
+
+  if (!todayLoaded) {
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    currentDate.value = yesterday;
+    await fetchChartPrices();
+  }
+}
+function closeChartModal() {
+  showChartModal.value = false;
+  document.body.classList.remove('modal-open');
+}
+
+async function fetchChartPrices(): Promise<boolean> {
+  const year = currentDate.value.getFullYear();
+  const month = String(currentDate.value.getMonth() + 1).padStart(2, '0');
+  const day = String(currentDate.value.getDate()).padStart(2, '0');
+  const url = `https://vasia123.github.io/farm-world-space-prices/${year}-${month}/${day}.json`;
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('Failed to fetch chart prices');
+    }
+    const data = await response.json();
+    chartPrices.value = data;
+    chartError.value = false;
+    return true;
+  } catch (error) {
+    console.error('Error fetching chart prices:', error);
+    chartError.value = true;
+    return false;
+  }
+}
+const hasPrevDay = computed(() => {
+  const firstAvailableDate = new Date(2024, 3, 19);
+  return currentDate.value > firstAvailableDate;
+});
+
+const hasNextDay = computed(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return currentDate.value < today;
+});
+
+async function prevDay() {
+  const prevDate = new Date(currentDate.value);
+  prevDate.setDate(prevDate.getDate() - 1);
+
+  if (prevDate >= new Date(2023, 3, 20)) { // Замените на дату первого доступного дня
+    currentDate.value = prevDate;
+    const loaded = await fetchChartPrices();
+    if (!loaded) {
+      currentDate.value = new Date(currentDate.value);
+      currentDate.value.setDate(currentDate.value.getDate() + 1);
+    }
+  }
+}
+
+async function nextDay() {
+  const nextDate = new Date(currentDate.value);
+  nextDate.setDate(nextDate.getDate() + 1);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (nextDate <= today) {
+    currentDate.value = nextDate;
+    await fetchChartPrices();
+  }
+}
+const formatTime = (timestamp: number): string => {
+  const date = new Date(timestamp * 1000);
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
+};
+
+const chartData = computed(() => ({
+  labels: chartPrices.value.map(price => formatTime(price.date_update)),
+  datasets: [
+    {
+      label: 'FOOD',
+      data: chartPrices.value.map(price => parseFloat(price.FOOD)),
+      borderColor: 'blue',
+      fill: false
+    },
+    {
+      label: 'GOLD',
+      data: chartPrices.value.map(price => parseFloat(price.GOLD)),
+      borderColor: 'gold',
+      fill: false
+    },
+    {
+      label: 'WOOD',
+      data: chartPrices.value.map(price => parseFloat(price.WOOD)),
+      borderColor: 'green',
+      fill: false
+    }
+  ]
+}));
+
+const chartOptions = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  scales: {
+    x: {
+      display: true,
+      title: {
+        display: true,
+        text: new Date(currentDate.value).toLocaleDateString()
+      }
+    },
+    y: {
+      display: true,
+      title: {
+        display: true,
+        text: 'Price'
+      }
+    }
+  }
+}));
 
 
 onMounted(() => {

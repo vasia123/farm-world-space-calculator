@@ -555,3 +555,13 @@ table.table.mwm td {
 .add-tool-button i {
   margin-right: 4px;
 }
+
+.chart-container {
+  height: 400px;
+}
+.modal {
+  z-index: 2000;
+}
+.chart-modal .modal-dialog {
+  max-width: 90%;
+}
