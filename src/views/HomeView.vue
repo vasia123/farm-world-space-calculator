@@ -810,6 +810,7 @@ const chartPrices = ref<{
 }[]>([]);
 const chartError = ref(false);
 const currentDate = ref(new Date());
+const chartCache = reactive<Record<string, { data: typeof chartPrices.value; timestamp: number }>>({});
 
 async function openChartModal() {
   showChartModal.value = true;
@@ -818,15 +819,29 @@ async function openChartModal() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
   currentDate.value = today;
+
+  if (currentDate.value.getTime() === today.getTime() || currentDate.value.getTime() === yesterday.getTime()) {
+    // Force reload prices for today and yesterday
+    delete chartCache[getChartCacheKey(currentDate.value)];
+  }
+
   const todayLoaded = await fetchChartPrices();
 
   if (!todayLoaded) {
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
     currentDate.value = yesterday;
     await fetchChartPrices();
   }
+}
+
+function getChartCacheKey(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 function closeChartModal() {
   showChartModal.value = false;
@@ -837,6 +852,20 @@ async function fetchChartPrices(): Promise<boolean> {
   const year = currentDate.value.getFullYear();
   const month = String(currentDate.value.getMonth() + 1).padStart(2, '0');
   const day = String(currentDate.value.getDate()).padStart(2, '0');
+  const cacheKey = `${year}-${month}-${day}`;
+
+  if (chartCache[cacheKey]) {
+    const cachedData = chartCache[cacheKey];
+    const now = Date.now();
+    const cacheAge = (now - cachedData.timestamp) / 1000; // Cache age in seconds
+
+    if (cacheAge < 300) { // Cache is valid for 5 minutes (300 seconds)
+      chartPrices.value = cachedData.data;
+      chartError.value = false;
+      return true;
+    }
+  }
+
   const url = `https://vasia123.github.io/farm-world-space-prices/${year}-${month}/${day}.json`;
 
   try {
@@ -847,6 +876,12 @@ async function fetchChartPrices(): Promise<boolean> {
     const data = await response.json();
     chartPrices.value = data;
     chartError.value = false;
+
+    chartCache[cacheKey] = {
+      data: data,
+      timestamp: Date.now()
+    };
+
     return true;
   } catch (error) {
     console.error('Error fetching chart prices:', error);

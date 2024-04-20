@@ -44,6 +44,11 @@ const i18n = createI18n({
             addAccount: "Add Account",
             myAccount: "My Account",
             fullDailyProfit: "Full daily",
+            showCharts: "Show Charts",
+            priceCharts: "Price Charts",
+            prevDay: "Previous Day",
+            nextDay: "Next Day",
+            chartError: "Failed to load chart data.",
         },
         ru: {
             title: "Калькулятор окупаемости",
@@ -83,6 +88,11 @@ const i18n = createI18n({
             addAccount: "Добавить аккаунт",
             myAccount: "Мой аккаунт",
             fullDailyProfit: "Всего в день",
+            showCharts: "Показать графики",
+            priceCharts: "Графики цен",
+            prevDay: "Предыдущий день",
+            nextDay: "Следующий день",
+            chartError: "Не удалось загрузить данные графика.",
         },
     },
 });
