@@ -262,7 +262,7 @@
     <div class="text-center">
       {{ $t('appreciationText') }}
       <div class="ton-address" @click="copyAddress">
-        UQDJrAnNVrdvw6Ba3R9g5Xdd40L2SjFZyKZUW2u3HikHxmSD<i class="ton-icon"></i>
+        UQDv96pmc4Ze5tqMbC8I7I7jzZUu2kgGYL5-oe7tIs5HhNYr<i class="ton-icon"></i>
       </div>
       <div v-if="showCopiedMessage" class="copied-message">{{ $t('copiedMessage') }}</div>
     </div>
@@ -414,7 +414,7 @@ const showCopiedMessage = ref(false);
 
 const copyAddress = async () => {
   try {
-    await navigator.clipboard.writeText('UQDJrAnNVrdvw6Ba3R9g5Xdd40L2SjFZyKZUW2u3HikHxmSD');
+    await navigator.clipboard.writeText('UQDv96pmc4Ze5tqMbC8I7I7jzZUu2kgGYL5-oe7tIs5HhNYr');
     showCopiedMessage.value = true;
     setTimeout(() => {
       showCopiedMessage.value = false;
