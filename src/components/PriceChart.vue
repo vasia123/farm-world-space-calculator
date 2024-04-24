@@ -1,113 +1,75 @@
 <template>
-    <div ref="chartContainer" style="position: relative; width: 100%; height: 100%;">
-        <Line :data="chartData" :options="chartOptions" />
-    </div>
+    <div ref="chartContainer" style="position: relative; width: 100%; height: 100%;"></div>
 </template>
 
 <script setup lang="ts">
-import { Line } from 'vue-chartjs'
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-    type ChartData,
-    type ChartOptions
-} from 'chart.js'
-import zoomPlugin from 'chartjs-plugin-zoom'
-import { watch, ref, type PropType, onMounted } from 'vue';
-
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-    zoomPlugin
-)
+import { onMounted, ref, watch, type PropType } from 'vue';
+import { createChart, type IChartApi, type LineData, type ISeriesApi, type UTCTimestamp } from 'lightweight-charts';
 
 const props = defineProps({
-    chartData: {
-        type: Object as PropType<ChartData<'line'>>,
-        required: true
-    },
-    chartOptions: {
-        type: Object as PropType<ChartOptions<'line'>>,
-        default: () => ({
-            responsive: true,
-            maintainAspectRatio: false
-        })
-    }
-})
+    foodData: { type: Object as PropType<LineData<UTCTimestamp>[]>, required: true },
+    goldData: { type: Object as PropType<LineData<UTCTimestamp>[]>, required: true },
+    woodData: { type: Object as PropType<LineData<UTCTimestamp>[]>, required: true },
+    chartOptions: { type: Object, default: () => ({}) }
+});
 
-const chartOptions = ref(props.chartOptions)
-const chartContainer = ref<HTMLElement | null>(null)
+let chart: IChartApi | null = null;
+let foodSeries: ISeriesApi<'Line'> | null = null;
+let goldSeries: ISeriesApi<'Line'> | null = null;
+let woodSeries: ISeriesApi<'Line'> | null = null;
+
+const chartContainer = ref<HTMLElement | null>(null);
+
+const initChart = () => {
+    if (!chartContainer.value) return;
+
+    chart = createChart(chartContainer.value, {
+        width: chartContainer.value.clientWidth,
+        height: chartContainer.value.clientHeight,
+        ...props.chartOptions,
+    });
+
+    foodSeries = chart.addLineSeries({
+        color: 'blue',
+        lineWidth: 2,
+        title: 'Food',
+    });
+    goldSeries = chart.addLineSeries({
+        color: 'gold',
+        lineWidth: 2,
+        title: 'Gold',
+    });
+    woodSeries = chart.addLineSeries({
+        color: 'green',
+        lineWidth: 2,
+        title: 'Wood',
+    });
+
+    foodSeries.setData(props.foodData);
+    goldSeries.setData(props.goldData);
+    woodSeries.setData(props.woodData);
+
+    chart.timeScale().fitContent();
+};
+
+const updateChart = () => {
+    if (!foodSeries || !goldSeries || !woodSeries) return;
+
+    foodSeries.setData(props.foodData);
+    goldSeries.setData(props.goldData);
+    woodSeries.setData(props.woodData);
+};
+
 
 watch(
-    () => props.chartOptions,
-    (newOptions) => {
-        chartOptions.value = {
-            ...newOptions,
-            plugins: {
-                ...newOptions.plugins,
-                zoom: {
-                    zoom: {
-                        wheel: {
-                            enabled: true,
-                        },
-                        pinch: {
-                            enabled: true
-                        },
-                        mode: 'xy',
-                    },
-                    pan: {
-                        enabled: true,
-                        mode: 'xy',
-                        onPanStart: ({ event }: { event: Event }) => {
-                            if (event instanceof TouchEvent && event.type === 'touchstart') {
-                                event.preventDefault();
-                            }
-                            return false;
-                        },
-                        onPan: ({ chart }: { chart: ChartJS }) => {
-                            if (chartContainer.value) {
-                                const event = chart.canvas.parentElement?.parentElement?.ownerDocument?.defaultView?.event as TouchEvent | undefined;
-                                if (event && event.type === 'touchmove') {
-                                    event.preventDefault();
-                                }
-                            }
-                        },
-                    }
-                }
-            }
-        }
+    () => [props.foodData, props.goldData, props.woodData],
+    () => {
+        updateChart();
     },
     { deep: true }
-)
+);
 
 onMounted(() => {
-    if (chartContainer.value) {
-        chartContainer.value.addEventListener('wheel', (event) => {
-            event.preventDefault();
-        }, { passive: false });
-
-        chartContainer.value.addEventListener('touchstart', (event) => {
-            if (event.touches.length === 1) {
-                event.preventDefault();
-            }
-        }, { passive: false });
-
-        chartContainer.value.addEventListener('touchmove', (event) => {
-            if (event.touches.length === 1) {
-                event.preventDefault();
-            }
-        }, { passive: false });
-    }
-})
+    initChart();
+});
 </script>

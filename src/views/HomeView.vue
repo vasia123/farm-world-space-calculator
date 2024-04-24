@@ -23,34 +23,17 @@
       <ul class="nav navbar-nav nav-flex-icons ml-auto">
         <li class="nav-item">
           <button class="nav-link btn btn-link" :class="{ 'active': locale === 'en' }" @click="changeLanguage('en')">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30" class="flag-icon">
-              <clipPath id="t">
-                <path d="M30,15 h30 v15 z v15 h-30 z h-30 v-15 z v-15 h30 z" />
-              </clipPath>
-              <path d="M0,0 v30 h60 v-30 z" fill="#00247d" />
-              <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6" />
-              <path d="M0,0 L60,30 M60,0 L0,30" clip-path="url(#t)" stroke="#cf142b" stroke-width="4" />
-              <path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10" />
-              <path d="M30,0 v30 M0,15 h60" stroke="#cf142b" stroke-width="6" />
-            </svg>
+            <FlagEng />
           </button>
         </li>
         <li class="nav-item">
           <button class="nav-link btn btn-link" :class="{ 'active': locale === 'ru' }" @click="changeLanguage('ru')">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9 6" class="flag-icon">
-              <rect fill="#fff" width="9" height="3" />
-              <rect fill="#d52b1e" y="3" width="9" height="3" />
-              <rect fill="#0039a6" y="2" width="9" height="2" />
-            </svg>
+            <FlagRu />
           </button>
         </li>
         <li class="nav-item">
           <button class="nav-link btn btn-link" @click="toggleSettingsMenu">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-              <path d="M0 0h24v24H0z" fill="none" />
-              <path
-                d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z" />
-            </svg>
+            <SettingsIcon />
           </button>
         </li>
       </ul>
@@ -257,6 +240,7 @@
         </div>
       </div>
     </div>
+
   </div>
   <footer class="footer">
     <div class="text-center">
@@ -379,7 +363,8 @@
           <div v-if="chartError && !chartPrices.length" class="alert alert-danger">{{ $t('chartError') }}</div>
           <div v-else>
             <div class="chart-container">
-              <PriceChart :chart-data="chartData" :chart-options="chartOptions" />
+              <PriceChart :food-data="foodData" :gold-data="goldData" :wood-data="woodData"
+                :chart-options="chartOptions" />
             </div>
             <div class="navigation">
               <button @click="prevDay" :disabled="!hasPrevDay" class="btn btn-secondary">{{ $t('prevDay') }}</button>
@@ -400,8 +385,13 @@ import PencilIcon from '@/components/icons/pencil-icon.vue'
 import DoneIcon from '@/components/icons/done-icon.vue'
 import AddIcon from '@/components/icons/add-icon.vue'
 import PriceChart from '@/components/PriceChart.vue';
+import FlagEng from '@/components/icons/flag-eng.vue'
+import FlagRu from '@/components/icons/flag-ru.vue'
+import SettingsIcon from '@/components/icons/settings-icon.vue'
+import type { UTCTimestamp } from 'lightweight-charts';
+import { formatNumber } from '@/shared/utils'
+import type { Account, ResourceType, Tool } from '@/types/main';
 
-// TODO: система аккаунтов
 // TODO: калькулятор цены стаков
 
 const { locale, t: $t } = useI18n();
@@ -423,30 +413,6 @@ const copyAddress = async () => {
     console.error('Failed to copy address:', error);
   }
 };
-
-type ResourceType = 'wood' | 'food' | 'gold'
-
-interface Tool {
-  name: string;
-  icon: string;
-  profit: number;
-  wood: number;
-  gold: number;
-  cooldown: number;
-  resource: ResourceType;
-  energy: number;
-  durability: number;
-  maxDurability: number;
-}
-interface CraftedTool extends Tool {
-  craftPrice: number;
-}
-interface Account {
-  id: number;
-  name: string;
-  tools: CraftedTool[];
-  editing: boolean;
-}
 
 const accounts = ref<Account[]>([]);
 
@@ -706,43 +672,10 @@ function getAccountToolsConsumptionSummary(accountId: number): Record<string, nu
 
   return consumptionSummary;
 }
-// function getAllToolsResourceSummary(): Record<string, number> {
-//   const resourceSummary: Record<string, number> = {};
-//   accounts.value.forEach(account => {
-//     account.tools.forEach(tool => {
-//       const resource = tool.resource;
-//       const amount = tool.profit * 24;
-//       if (amount > 0) {
-//         if (resourceSummary[resource]) {
-//           resourceSummary[resource] += amount;
-//         } else {
-//           resourceSummary[resource] = amount;
-//         }
-//       }
-//     });
-//   });
-//   return resourceSummary;
-// }
 
 function getAllToolsProfitSummary(): number {
   return accounts.value.reduce((sum, account) => sum + account.tools.reduce((acc, tool) => acc + getToolDailyProfit(tool), 0), 0);
 }
-
-// function getAllToolsConsumptionSummary(): Record<string, number> {
-//   const consumptionSummary: Record<string, number> = {
-//     food: 0,
-//     gold: 0
-//   };
-
-//   accounts.value.forEach(account => {
-//     account.tools.forEach(tool => {
-//       consumptionSummary.food += tool.energy / tool.cooldown * 24 / 5;
-//       consumptionSummary.gold += tool.durability / tool.cooldown * 24 / 5;
-//     });
-//   });
-
-//   return consumptionSummary;
-// }
 function getAllToolsROI(): number {
   const totalProfit = getAllToolsProfitSummary();
   if (totalProfit === 0) return 0;
@@ -750,26 +683,6 @@ function getAllToolsROI(): number {
   return totalInvestment / totalProfit;
 }
 
-function formatNumber(num: number | string): string {
-  const number = Number(num)
-  if (Number.isInteger(number)) {
-    return String(num);
-  }
-  const numString = num.toString();
-  const decimalPos = numString.indexOf('.');
-  if (decimalPos === -1) {
-    return numString;
-  }
-  let firstSignificantDigitPos = decimalPos + 1;
-  while (numString[firstSignificantDigitPos] === '0') {
-    firstSignificantDigitPos++;
-  }
-  if (firstSignificantDigitPos > decimalPos + 1 + 8) {
-    return numString.substring(0, decimalPos);
-  }
-  const decimalPlaces = firstSignificantDigitPos - decimalPos - 1 + 2;
-  return number.toFixed(decimalPlaces);
-}
 const tonPriceUsd = ref<number | string>('...');
 
 function saveTonPrice(price: number | string) {
@@ -926,56 +839,66 @@ async function nextDay() {
     await fetchChartPrices();
   }
 }
-const formatTime = (timestamp: number): string => {
-  const date = new Date(timestamp * 1000);
-  const hours = date.getHours().toString().padStart(2, '0');
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  return `${hours}:${minutes}`;
-};
 
-const chartData = computed(() => ({
-  labels: chartPrices.value.map(price => formatTime(price.date_update)),
-  datasets: [
-    {
-      label: 'FOOD',
-      data: chartPrices.value.map(price => parseFloat(price.FOOD)),
-      borderColor: 'blue',
-      fill: false
-    },
-    {
-      label: 'GOLD',
-      data: chartPrices.value.map(price => parseFloat(price.GOLD)),
-      borderColor: 'gold',
-      fill: false
-    },
-    {
-      label: 'WOOD',
-      data: chartPrices.value.map(price => parseFloat(price.WOOD)),
-      borderColor: 'green',
-      fill: false
-    }
-  ]
-}));
+const foodData = computed(() =>
+  chartPrices.value.map(price => ({
+    time: (price.date_update) as UTCTimestamp,
+    value: parseFloat(price.FOOD)
+  }))
+);
+
+const goldData = computed(() =>
+  chartPrices.value.map(price => ({
+    time: (price.date_update) as UTCTimestamp,
+    value: parseFloat(price.GOLD)
+  }))
+);
+
+const woodData = computed(() =>
+  chartPrices.value.map(price => ({
+    time: (price.date_update) as UTCTimestamp,
+    value: parseFloat(price.WOOD)
+  }))
+);
 
 const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
-  scales: {
-    x: {
-      display: true,
-      title: {
-        display: true,
-        text: new Date(currentDate.value).toLocaleDateString()
-      }
+  timeScale: {
+    timeVisible: true,
+    secondsVisible: false,
+  },
+  localization: {
+    timeFormatter: (time: UTCTimestamp) => {
+      const date = new Date(time);
+      const hours = date.getUTCHours().toString().padStart(2, '0');
+      const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
     },
-    y: {
-      display: true,
-      title: {
-        display: true,
-        text: 'Price'
-      }
-    }
-  }
+    priceFormatter: (price: number) => price.toFixed(4),
+  },
+  layout: {
+    background: { color: '#fff' },
+    textColor: '#333333',
+  },
+  grid: {
+    vertLines: {
+      color: 'rgba(197, 203, 206, 0.5)',
+    },
+    horzLines: {
+      color: 'rgba(197, 203, 206, 0.5)',
+    },
+  },
+  legend: {
+    position: 'top',
+    layout: 'horizontal',
+    align: 'center',
+    verticalAlign: 'top',
+    fontSize: 12,
+    fontFamily: 'Helvetica',
+    itemMarginTop: 10,
+    itemMarginBottom: 10,
+  },
 }));
 
 
