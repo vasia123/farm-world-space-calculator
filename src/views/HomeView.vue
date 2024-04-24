@@ -362,6 +362,7 @@
         <div class="modal-body">
           <div v-if="chartError && !chartPrices.length" class="alert alert-danger">{{ $t('chartError') }}</div>
           <div v-else>
+            <ChartDateHeader :date="currentDate" />
             <div class="chart-container">
               <PriceChart :food-data="foodData" :gold-data="goldData" :wood-data="woodData"
                 :chart-options="chartOptions" />
@@ -388,6 +389,7 @@ import PriceChart from '@/components/PriceChart.vue';
 import FlagEng from '@/components/icons/flag-eng.vue'
 import FlagRu from '@/components/icons/flag-ru.vue'
 import SettingsIcon from '@/components/icons/settings-icon.vue'
+import ChartDateHeader from '@/components/ChartDateHeader.vue';
 import type { UTCTimestamp } from 'lightweight-charts';
 import { formatNumber } from '@/shared/utils'
 import type { Account, ResourceType, Tool } from '@/types/main';
