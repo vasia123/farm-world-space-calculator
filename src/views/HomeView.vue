@@ -430,7 +430,6 @@ const prices = reactive({
 });
 
 const state = ref<'server' | 'local'>('server');
-const serverPrices = ref();
 const serverError = ref(false);
 let priceTimeout: number;
 let priceTonTimeout: number;
@@ -509,7 +508,6 @@ function fetchPrices() {
       prices.wood = data.WOOD;
       prices.food = data.FOOD;
       prices.gold = data.GOLD;
-      serverPrices.value = data;
       priceTimeout = window.setTimeout(fetchPrices, 30 * 1000);
     })
     .catch(error => {
@@ -827,6 +825,6 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
   window.clearTimeout(priceTimeout);
-  window.clearTimeout(priceTonTimeout);
+  window.clearInterval(priceTonTimeout);
 });
 </script>
