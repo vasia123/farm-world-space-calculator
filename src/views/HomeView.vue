@@ -362,14 +362,9 @@
         <div class="modal-body">
           <div v-if="chartError && !chartPrices.length" class="alert alert-danger">{{ $t('chartError') }}</div>
           <div v-else>
-            <ChartDateHeader :date="currentDate" />
             <div class="chart-container">
               <PriceChart :food-data="foodData" :gold-data="goldData" :wood-data="woodData"
-                :chart-options="chartOptions" />
-            </div>
-            <div class="navigation">
-              <button @click="prevDay" :disabled="!hasPrevDay" class="btn btn-secondary">{{ $t('prevDay') }}</button>
-              <button @click="nextDay" :disabled="!hasNextDay" class="btn btn-secondary">{{ $t('nextDay') }}</button>
+                :fetch-more-data="fetchMoreData" />
             </div>
           </div>
         </div>
@@ -389,8 +384,7 @@ import PriceChart from '@/components/PriceChart.vue';
 import FlagEng from '@/components/icons/flag-eng.vue'
 import FlagRu from '@/components/icons/flag-ru.vue'
 import SettingsIcon from '@/components/icons/settings-icon.vue'
-import ChartDateHeader from '@/components/ChartDateHeader.vue';
-import type { UTCTimestamp } from 'lightweight-charts';
+import { type UTCTimestamp } from 'lightweight-charts';
 import { formatNumber } from '@/shared/utils'
 import type { Account, ResourceType, Tool } from '@/types/main';
 
@@ -727,39 +721,16 @@ const chartError = ref(false);
 const currentDate = ref(new Date());
 const chartCache = reactive<Record<string, { data: typeof chartPrices.value; timestamp: number }>>({});
 
+
 async function openChartModal() {
   showChartModal.value = true;
   document.body.classList.add('modal-open');
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-
-  currentDate.value = today;
-
-  if (currentDate.value.getTime() === today.getTime() || currentDate.value.getTime() === yesterday.getTime()) {
-    // Force reload prices for today and yesterday
-    delete chartCache[getChartCacheKey(currentDate.value)];
-  }
-
-  const todayLoaded = await fetchChartPrices();
-
-  if (!todayLoaded) {
-    currentDate.value = yesterday;
-    await fetchChartPrices();
-  }
-}
-
-function getChartCacheKey(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  await fetchChartPrices();
 }
 function closeChartModal() {
   showChartModal.value = false;
+  currentDate.value = new Date();
+  chartPrices.value = [];
   document.body.classList.remove('modal-open');
 }
 
@@ -775,7 +746,7 @@ async function fetchChartPrices(): Promise<boolean> {
     const cacheAge = (now - cachedData.timestamp) / 1000; // Cache age in seconds
 
     if (cacheAge < 300) { // Cache is valid for 5 minutes (300 seconds)
-      chartPrices.value = cachedData.data;
+      chartPrices.value = [...cachedData.data, ...chartPrices.value];
       chartError.value = false;
       return true;
     }
@@ -789,7 +760,7 @@ async function fetchChartPrices(): Promise<boolean> {
       throw new Error('Failed to fetch chart prices');
     }
     const data = await response.json();
-    chartPrices.value = data;
+    chartPrices.value = [...data, ...chartPrices.value];
     chartError.value = false;
 
     chartCache[cacheKey] = {
@@ -802,43 +773,6 @@ async function fetchChartPrices(): Promise<boolean> {
     console.error('Error fetching chart prices:', error);
     chartError.value = true;
     return false;
-  }
-}
-const hasPrevDay = computed(() => {
-  const firstAvailableDate = new Date(2024, 3, 19);
-  return currentDate.value > firstAvailableDate;
-});
-
-const hasNextDay = computed(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return currentDate.value < today;
-});
-
-async function prevDay() {
-  const prevDate = new Date(currentDate.value);
-  prevDate.setDate(prevDate.getDate() - 1);
-
-  if (prevDate >= new Date(2023, 3, 20)) { // Замените на дату первого доступного дня
-    currentDate.value = prevDate;
-    const loaded = await fetchChartPrices();
-    if (!loaded) {
-      currentDate.value = new Date(currentDate.value);
-      currentDate.value.setDate(currentDate.value.getDate() + 1);
-    }
-  }
-}
-
-async function nextDay() {
-  const nextDate = new Date(currentDate.value);
-  nextDate.setDate(nextDate.getDate() + 1);
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  if (nextDate <= today) {
-    currentDate.value = nextDate;
-    await fetchChartPrices();
   }
 }
 
@@ -862,47 +796,16 @@ const woodData = computed(() =>
     value: parseFloat(price.WOOD)
   }))
 );
+async function fetchMoreData() {
+  const prevDate = new Date(currentDate.value);
+  prevDate.setDate(prevDate.getDate() - 1);
 
-const chartOptions = computed(() => ({
-  responsive: true,
-  maintainAspectRatio: false,
-  timeScale: {
-    timeVisible: true,
-    secondsVisible: false,
-  },
-  localization: {
-    timeFormatter: (time: UTCTimestamp) => {
-      const date = new Date(time);
-      const hours = date.getUTCHours().toString().padStart(2, '0');
-      const minutes = date.getUTCMinutes().toString().padStart(2, '0');
-      return `${hours}:${minutes}`;
-    },
-    priceFormatter: (price: number) => price.toFixed(4),
-  },
-  layout: {
-    background: { color: '#fff' },
-    textColor: '#333333',
-  },
-  grid: {
-    vertLines: {
-      color: 'rgba(197, 203, 206, 0.5)',
-    },
-    horzLines: {
-      color: 'rgba(197, 203, 206, 0.5)',
-    },
-  },
-  legend: {
-    position: 'top',
-    layout: 'horizontal',
-    align: 'center',
-    verticalAlign: 'top',
-    fontSize: 12,
-    fontFamily: 'Helvetica',
-    itemMarginTop: 10,
-    itemMarginBottom: 10,
-  },
-}));
-
+  if (prevDate >= new Date(2023, 3, 19)) {
+    currentDate.value = prevDate;
+    return fetchChartPrices();
+  }
+  return false;
+}
 
 onMounted(() => {
   const savedLanguage = localStorage.getItem('selectedLanguage');
