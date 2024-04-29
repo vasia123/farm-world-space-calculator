@@ -812,6 +812,13 @@ async function fetchMoreData() {
   return false;
 }
 
+let reloadTimeout: number;
+function startReloadTimer() {
+  reloadTimeout = window.setTimeout(() => {
+    window.location.reload();
+  }, 30 * 60 * 1000);
+}
+
 onMounted(() => {
   const savedLanguage = localStorage.getItem('selectedLanguage');
   if (savedLanguage) {
@@ -827,11 +834,16 @@ onMounted(() => {
   } else {
     fetchTonPrice();
   }
+  startReloadTimer();
+  window.addEventListener('beforeunload', () => {
+    window.clearTimeout(reloadTimeout);
+  });
 });
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
   window.clearTimeout(priceTimeout);
   window.clearInterval(priceTonTimeout);
+  window.clearTimeout(reloadTimeout);
 });
 </script>
