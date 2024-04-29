@@ -241,6 +241,20 @@
       </div>
     </div>
 
+    <div class=" resources-container useful-tools-container">
+      <div class="col-lg-4 col-md-6 col-sm-12 mb-4 text-center useful-tool-item">
+        <div class="card card-cascade wider">
+          <div class="view view-cascade grey darken-3">
+            <div class="m-1">
+              <button @click="openStackPriceCalculator" class="btn btn-primary">
+                {{ $t('stackPriceCalculator') }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
   <footer class="footer">
     <div class="text-center">
@@ -371,10 +385,53 @@
       </div>
     </div>
   </div>
+
+  <div v-if="showStackPriceModal" class="modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ $t('stackPriceCalculator') }}</h5>
+          <button type="button" class="close" @click="closeStackPriceModal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="resourceAmount">{{ $t('resourceAmount') }}</label>
+            <input type="number" id="resourceAmount" class="form-control" v-model.number="resourceAmount">
+          </div>
+          <div class="form-group">
+            <label for="resourceType">{{ $t('resourceType') }}</label>
+            <select id="resourceType" class="form-control" v-model="selectedResource">
+              <option value="wood">{{ $t('wood') }}</option>
+              <option value="food">{{ $t('food') }}</option>
+              <option value="gold">{{ $t('gold') }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="pricePerUnit">{{ $t('pricePerUnit') }}</label>
+            <input type="number" id="pricePerUnit" class="form-control" v-model.number="pricePerUnit"
+              :disabled="autoPrice" step="0.0001">
+          </div>
+          <div class="form-group form-check">
+            <input type="checkbox" id="autoPrice" class="form-check-input" v-model="autoPrice"
+              @change="updatePricePerUnit">
+            <label class="form-check-label" for="autoPrice">{{ $t('autoPrice') }}</label>
+          </div>
+          <div class="form-group">
+            <label>{{ $t('stackPrice') }}<i class="ton-icon"></i>: {{ stackPrice.toFixed(6) }}</label>
+            <button @click="copyStackPrice" class="btn btn-link p-0">
+              <CopyIcon />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
+import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import TrashIcon from '@/components/icons/trash-icon.vue'
 import PencilIcon from '@/components/icons/pencil-icon.vue'
@@ -384,6 +441,7 @@ import PriceChart from '@/components/PriceChart.vue';
 import FlagEng from '@/components/icons/flag-eng.vue'
 import FlagRu from '@/components/icons/flag-ru.vue'
 import SettingsIcon from '@/components/icons/settings-icon.vue'
+import CopyIcon from '@/components/icons/copy-icon.vue';
 import { type UTCTimestamp } from 'lightweight-charts';
 import { formatNumber } from '@/shared/utils'
 import type { Account, ResourceType, Tool } from '@/types/main';
@@ -810,6 +868,52 @@ async function fetchMoreData() {
     return fetchChartPrices();
   }
   return false;
+}
+
+const showStackPriceModal = ref(false);
+function openStackPriceCalculator() {
+  showStackPriceModal.value = true;
+  document.body.classList.add('modal-open');
+}
+const resourceAmount = ref(1);
+const selectedResource = ref('wood');
+const pricePerUnit = ref(getResourcePrice(selectedResource.value));
+const autoPrice = ref(true);
+
+function updatePricePerUnit() {
+  if (autoPrice.value) {
+    pricePerUnit.value = getResourcePrice(selectedResource.value);
+  }
+}
+
+watch(selectedResource, () => {
+  if (autoPrice.value) {
+    pricePerUnit.value = getResourcePrice(selectedResource.value);
+  }
+});
+
+watch(prices, () => {
+  if (autoPrice.value) {
+    pricePerUnit.value = getResourcePrice(selectedResource.value);
+  }
+}, { deep: true });
+
+const stackPrice = computed(() => {
+  const price = autoPrice.value ? getResourcePrice(selectedResource.value) - 0.000002 : pricePerUnit.value;
+  return resourceAmount.value * price;
+});
+function closeStackPriceModal() {
+  showStackPriceModal.value = false;
+  document.body.classList.remove('modal-open');
+}
+
+async function copyStackPrice() {
+  try {
+    await navigator.clipboard.writeText(stackPrice.value.toFixed(8).toString());
+    // Опционально: показать сообщение об успешном копировании
+  } catch (error) {
+    console.error('Failed to copy stack price:', error);
+  }
 }
 
 let reloadTimeout: number;
