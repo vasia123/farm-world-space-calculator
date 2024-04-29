@@ -723,7 +723,14 @@ const chartCache = reactive<Record<string, { data: typeof chartPrices.value; tim
 async function openChartModal() {
   showChartModal.value = true;
   document.body.classList.add('modal-open');
-  await fetchChartPrices();
+  const result = await fetchChartPrices();
+  if (!result) {
+    const prevDate = new Date(currentDate.value);
+    prevDate.setDate(prevDate.getDate() - 1);
+    currentDate.value = prevDate;
+    chartPrices.value = [];
+    await fetchChartPrices();
+  }
 }
 function closeChartModal() {
   showChartModal.value = false;
