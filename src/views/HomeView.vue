@@ -153,6 +153,20 @@
       </div>
     </div>
 
+    <div class=" resources-container useful-tools-container">
+      <div class="col-lg-4 col-md-6 col-sm-12 mb-4 text-center useful-tool-item">
+        <div class="card card-cascade wider">
+          <div class="view view-cascade grey darken-3">
+            <div class="m-1">
+              <button @click="openStackPriceCalculator" class="btn btn-primary">
+                {{ $t('stackPriceCalculator') }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="resources-container">
       <div class="col-lg-4 col-md-6 col-sm-12 mb-4 text-center resource-item"
         v-for="(toolsOfType, resource) in toolTypes" :key="resource">
@@ -235,20 +249,6 @@
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class=" resources-container useful-tools-container">
-      <div class="col-lg-4 col-md-6 col-sm-12 mb-4 text-center useful-tool-item">
-        <div class="card card-cascade wider">
-          <div class="view view-cascade grey darken-3">
-            <div class="m-1">
-              <button @click="openStackPriceCalculator" class="btn btn-primary">
-                {{ $t('stackPriceCalculator') }}
-              </button>
             </div>
           </div>
         </div>
