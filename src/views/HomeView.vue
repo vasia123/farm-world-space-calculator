@@ -899,7 +899,7 @@ watch(prices, () => {
 }, { deep: true });
 
 const stackPrice = computed(() => {
-  const price = autoPrice.value ? getResourcePrice(selectedResource.value) - 0.000002 : pricePerUnit.value;
+  const price = autoPrice.value ? getResourcePrice(selectedResource.value) - 0.000001 : pricePerUnit.value;
   return resourceAmount.value * price;
 });
 function closeStackPriceModal() {
