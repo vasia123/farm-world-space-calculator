@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-lg navbar-dark fixed-top scrolling-navbar">
     <div class="navbar-prices">
       <div class="alert alert-light p-1 fw_topBox token_TON">
-        <img class="mr-1" src="/img/ton_g.png" alt="TON Coin">
+        <img class="mr-1" src="/img/ton.png" alt="TON Coin">
         <strong>{{ formatNumber(tonPriceUsd) }}$</strong>
       </div>
       <div class="alert alert-light p-1 fw_topBox token_FWW">

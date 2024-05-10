@@ -1,10 +1,15 @@
 import { defineStore } from 'pinia';
 import { useAccountsStore } from './accounts';
 import { useToolsStore } from './tools';
+import { useBuffsStore } from './buffs';
+import { usePricesStore } from './prices';
+import type { ResourceFactoriesType, Buff } from '@/types/main';
 
 export const useSummariesStore = defineStore('summaries', () => {
   const accountsStore = useAccountsStore();
   const toolsStore = useToolsStore();
+  const buffsStore = useBuffsStore();
+  const pricesStore = usePricesStore();
 
   function getAccountToolsResourceSummary(accountId: number): Record<string, number> {
     const account = accountsStore.accounts.find(acc => acc.id === accountId);
@@ -70,12 +75,36 @@ export const useSummariesStore = defineStore('summaries', () => {
     return totalInvestment / totalProfit;
   }
 
+  function getAccountBuffROI(accountId: number, buff: Buff): number {
+    const account = accountsStore.accounts.find(acc => acc.id === accountId);
+    if (!account) return 0;
+    const buffData = buffsStore.buffs.find(b => b.name === buff.name);
+    if (!buffData) throw new Error("no buff data!");
+  
+    const buffCost = Object.entries(buffData.cost).reduce((total, [resource, amount]) => {
+      const tonTotal = resource === 'ton' 
+          ? amount 
+          : amount * pricesStore.getResourcePrice(resource as ResourceFactoriesType)
+      return total + tonTotal;
+    }, 0);
+  
+    const originalProfit = getAccountToolsProfitSummary(accountId);
+    const updatedTools = account.tools.map(tool => buffsStore.applyBuffToTool(tool, buff));
+    const updatedProfit = updatedTools.reduce((total, tool) => total + toolsStore.getToolDailyProfit(tool), 0);
+  
+    const profitIncrease = updatedProfit - originalProfit;
+    const roiDays = buffCost / profitIncrease;
+  
+    return roiDays;
+  }
+
   return {
     getAccountToolsResourceSummary,
     getAccountToolsProfitSummary,
     getAccountToolsConsumptionSummary,
     getAllToolsProfitSummary,
     getAllToolsROI,
-    getUserToolsROI
+    getUserToolsROI,
+    getAccountBuffROI,
   };
 });

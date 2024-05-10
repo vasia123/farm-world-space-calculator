@@ -4,7 +4,11 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch, type PropType } from 'vue';
-import { createChart, type IChartApi, type LineData, type ISeriesApi, type UTCTimestamp, TickMarkType } from 'lightweight-charts';
+import { useI18n } from 'vue-i18n';
+import { createChart, TickMarkType } from 'lightweight-charts';
+import type { IChartApi, LineData, ISeriesApi, UTCTimestamp } from 'lightweight-charts';
+
+const { t: $t } = useI18n();
 
 const props = defineProps({
     resourcesData: {
@@ -99,7 +103,7 @@ const initChart = () => {
         seriesRefs.value[resource] = chart.addLineSeries({
             color: getResourceColor(resource),
             lineWidth: 2,
-            title: resource,
+            title: $t(resource.toLowerCase()),
         });
         if (sortedData.length === 0) {
             loadMoreData();
