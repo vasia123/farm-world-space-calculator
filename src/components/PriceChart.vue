@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch, type PropType } from 'vue';
-import { createChart, type IChartApi, type LineData, type ISeriesApi, type UTCTimestamp, PriceScaleMode, type Time, TickMarkType } from 'lightweight-charts';
+import { createChart, type IChartApi, type LineData, type ISeriesApi, type UTCTimestamp, TickMarkType } from 'lightweight-charts';
 
 const props = defineProps({
     foodData: { type: Object as PropType<LineData<UTCTimestamp>[]>, required: true },
