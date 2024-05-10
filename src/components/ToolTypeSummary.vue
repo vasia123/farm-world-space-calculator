@@ -1,14 +1,15 @@
 <template>
   <div class="tool-type-summary">
     <div class="resources-container">
-      <div v-for="(toolsOfType, resource) in toolTypes" :key="resource" class="col-lg-4 col-md-6 col-sm-12 mb-4 text-center resource-item">
+      <div v-for="(toolsOfType, resource) in toolTypes" :key="resource"
+        class="col-lg-4 col-md-6 col-sm-12 mb-4 text-center resource-item">
         <div class="card card-cascade wider">
           <div class="view view-cascade grey darken-3">
             <div class="m-1">
               <div class="text-center">
                 <div class="chip gradbg-dark-grey shd mb-0 waves-effect resources-big">
                   <div class="mt-2 ml-2">
-                    <img :src="'/farm-world-space-calculator/img/' + String(resource).toLowerCase() + '_shadow.png'">
+                    <img :src="'/farm-world-space-calculator/img/' + String(resource).toLowerCase() + '.png'">
                     <span class="badge darken-3 md no-shadow">
                       {{ formatNumber(pricesStore.getResourcePrice(resource)) }} <i class="ton-icon"></i>
                     </span>
@@ -46,7 +47,7 @@
                   <div class="d-block fw_craft" v-if="tool.wood > 0">
                     <div class="d-inline-block w-50 text-right">
                       <span class="badge ssm no-shadow">{{ tool.wood }}</span>
-                      <img src="/img/wood_shadow.png" style="height: 16px;">
+                      <img src="/img/wood.png" style="height: 16px;">
                     </div>
                     <div class="d-inline-block w-50 text-right">
                       <span class="badge ssm no-shadow">
@@ -57,7 +58,7 @@
                   <div class="d-block fw_craft" v-if="tool.gold > 0">
                     <div class="d-inline-block w-50 text-right">
                       <span class="badge ssm no-shadow">{{ tool.gold }}</span>
-                      <img src="/img/gold_shadow.png" style="height: 16px;">
+                      <img src="/img/gold.png" style="height: 16px;">
                     </div>
                     <div class="d-inline-block w-50 text-right">
                       <span class="badge ssm no-shadow">
@@ -83,6 +84,122 @@
       </div>
     </div>
   </div>
+
+  <div class="resources-container">
+    <div v-for="(factory, factoryName) in factoriesStore.factories" :key="factoryName"
+      class="col-lg-4 col-md-6 col-sm-12 mb-4 text-center resource-item">
+      <div class="card card-cascade wider">
+        <div class="view view-cascade grey darken-3">
+          <div class="m-1">
+            <div class="text-center">
+              <div class="chip gradbg-dark-grey shd mb-0 waves-effect resources-big">
+                <div class="mt-2 ml-2">
+                  <img :src="'/farm-world-space-calculator/img/' + factory.resource + '.png'">
+                  <span class="badge darken-3 md no-shadow">
+                    {{ formatNumber(pricesStore.getResourcePrice(factory.resource)) }} <i class="ton-icon"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="d-block mt-4">
+              <div class="d-inline-block w-80 b-atomic">
+                <div class="d-inline-block w-25 flex-right">
+                  <img :src="'/farm-world-space-calculator/img/' + factoryName + '.jpg'" class="img-fluid ml-2">
+                  <div>
+                    <span class="badge ssm no-shadow">
+                      {{$t(factoryName)}}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="d-inline-block w-75 b-alcor">
+                  <div class="d-block fw_craft">
+                    <div class="d-inline-block w-50 text-right">
+                      &nbsp;
+                    </div>
+                    <div class="d-inline-block w-50 text-right">
+                      <span class="badge ssm no-shadow">
+                        {{ factory.build_slot_cost }} 
+                        <img :src="'/farm-world-space-calculator/img/stone.png'" style="height: 16px;">
+                      </span>
+                    </div>
+                  </div>
+                  <div class="d-block fw_craft">
+                    <div class="d-inline-block w-50 text-right">
+                      <span class="badge sm no-shadow">{{ $t('buildSlotCost') }}:</span>
+                    </div>
+                    <div class="d-inline-block w-50 text-right">
+                      <span class="badge grey darken-2 sm">
+                        {{ formatNumber(factory.build_slot_cost * pricesStore.getResourcePrice('stone')) }}<i
+                          class="ton-icon"></i>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <div class="d-block mt-4" v-for="factoryLevel in factory.levels" :key="factoryLevel.level">
+              <div class="d-inline-block w-50 b-atomic">
+                
+                <div class="d-inline-block w-25 flex-right">
+                  {{ $t('level') }} {{ factoryLevel.level }} 
+                </div>
+                <div class="d-inline-block w-75 flex-right vtop">
+                  <div class="d-block">
+                    <span class="badge sm no-shadow">{{ $t('dailyProfit') }}:</span>
+                    <span class="badge sm ml-1" :class="{
+                      'gradbg-lime2': factoriesStore.getFactoryDailyProfit(factoryName, factoryLevel.level) > 0,
+                      'gradbg-red': factoriesStore.getFactoryDailyProfit(factoryName, factoryLevel.level) < 0,
+                    }">
+                      {{ formatNumber(factoriesStore.getFactoryDailyProfit(factoryName, factoryLevel.level)) }}<i
+                        class="ton-icon"></i>
+                    </span>
+                  </div>
+                  <div class="d-block mt-2">
+                    <span class="ml-3 badge sm no-shadow">{{ $t('roi') }}:</span>
+                    <span class="badge grey darken-2 sm ml-1">
+                      {{ factoriesStore.getFactoryDailyProfit(factoryName, factoryLevel.level) > 0
+                        ? factoriesStore.getFactoryROI(factoryName, factoryLevel.level).days.toFixed(1)
+                        : '🤷‍♂️'
+                      }}
+                    </span>
+                    {{ $t('days') }}
+                  </div>
+                </div>
+              </div>
+              <div class="d-inline-block w-50 b-alcor">
+                <!-- Display resource requirements for upgrading the factory level -->
+                <div class="d-block fw_craft" v-for="(resourceAmount, resource) in factoryLevel.up_level_price"
+                  :key="resource">
+                  <div class="d-inline-block w-50 text-right">
+                    <span class="badge ssm no-shadow">{{ resourceAmount }}</span>
+                    <img :src="'/farm-world-space-calculator/img/' + resource + '.png'" style="height: 16px;">
+                  </div>
+                  <div class="d-inline-block w-50 text-right">
+                    <span class="badge ssm no-shadow">
+                      {{ formatNumber(resourceAmount * pricesStore.getResourcePrice(resource)) }}<i class="ton-icon"></i>
+                    </span>
+                  </div>
+                </div>
+                <div class="d-block fw_craft">
+                  <div class="d-inline-block w-50 text-right">
+                    <span class="badge sm no-shadow">{{ $t('upgradeCost') }}:</span>
+                  </div>
+                  <div class="d-inline-block w-50 text-right">
+                    <span class="badge grey darken-2 sm">
+                      {{ formatNumber(factoriesStore.getFactoryUpgradeCost(factoryName, factoryLevel.level)) }}<i
+                        class="ton-icon"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
   
 <script setup lang="ts">
@@ -91,10 +208,12 @@ import { useI18n } from 'vue-i18n';
 import { useToolsStore } from '@/stores/tools';
 import { usePricesStore } from '@/stores/prices';
 import { formatNumber } from '@/shared/utils';
+import { useFactoriesStore } from '@/stores/factories';
 
 const { t: $t } = useI18n();
 const toolsStore = useToolsStore();
 const pricesStore = usePricesStore();
+const factoriesStore = useFactoriesStore();
 
 const toolTypes = computed(() => toolsStore.toolTypes);
 const prices = computed(() => pricesStore.prices);

@@ -7,6 +7,12 @@ export const useChartStore = defineStore('chart', () => {
     FOOD: string;
     GOLD: string;
     WOOD: string;
+
+    INGOT: string;
+    PLANKS: string;
+    SOUP: string;
+    STONE: string;
+
     date_update: number;
   }[]>([]);
   const chartError = ref(false);
@@ -76,6 +82,34 @@ export const useChartStore = defineStore('chart', () => {
     }))
   );
 
+  const IngotData = computed(() =>
+    chartPrices.value.map(price => ({
+      time: price.date_update as UTCTimestamp,
+      value: parseFloat(price.INGOT)
+    }))
+  );
+
+  const PlanksData = computed(() =>
+    chartPrices.value.map(price => ({
+      time: price.date_update as UTCTimestamp,
+      value: parseFloat(price.PLANKS)
+    }))
+  );
+
+  const SoupData = computed(() =>
+    chartPrices.value.map(price => ({
+      time: price.date_update as UTCTimestamp,
+      value: parseFloat(price.SOUP)
+    }))
+  );
+
+  const StoneData = computed(() =>
+    chartPrices.value.map(price => ({
+      time: price.date_update as UTCTimestamp,
+      value: parseFloat(price.STONE)
+    }))
+  );
+
   async function fetchMoreData() {
     const prevDate = new Date(currentDate.value);
     prevDate.setDate(prevDate.getDate() - 1);
@@ -93,9 +127,15 @@ export const useChartStore = defineStore('chart', () => {
     currentDate,
     chartCache,
     fetchChartPrices,
+
     foodData,
     goldData,
     woodData,
+    IngotData,
+    PlanksData,
+    SoupData,
+    StoneData,
+
     fetchMoreData
   };
 });

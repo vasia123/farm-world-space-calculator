@@ -12,7 +12,7 @@ export function formatNumber(num: number | string): string {
     while (numString[firstSignificantDigitPos] === '0') {
         firstSignificantDigitPos++;
     }
-    if (firstSignificantDigitPos > decimalPos + 1 + 8) {
+    if (firstSignificantDigitPos > decimalPos + 8) {
         return numString.substring(0, decimalPos);
     }
     const decimalPlaces = firstSignificantDigitPos - decimalPos - 1 + 2;

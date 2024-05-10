@@ -30,9 +30,10 @@
           <div class="form-group">
             <label for="resourceType">{{ $t('resourceType') }}</label>
             <select id="resourceType" class="form-control" v-model="selectedResource">
-              <option value="wood">{{ $t('wood') }}</option>
-              <option value="food">{{ $t('food') }}</option>
-              <option value="gold">{{ $t('gold') }}</option>
+              <option v-for="resource in resources" :value="resource" :key="resource">
+                <img :src="`/farm-world-space-calculator/img/${resource}.png`" style="height: 16px;">
+                {{ $t(resource) }}
+              </option>
             </select>
           </div>
           <div class="form-group">
@@ -64,6 +65,7 @@ import { useModalsStore } from '@/stores/modals';
 import { usePricesStore } from '@/stores/prices';
 import CopyIcon from '@/components/icons/copy-icon.vue';
 import { formatNumber } from '@/shared/utils';
+import type { ResourceType, ResourceFactoriesType } from '@/types/main';
 
 const { t: $t } = useI18n();
 const modalsStore = useModalsStore();
@@ -75,8 +77,18 @@ function openStackPriceCalculator() {
   modalsStore.openStackPriceModal();
 }
 
+const resources: Array<ResourceType | ResourceFactoriesType> = [
+  "wood",
+  "food",
+  "gold",
+  "stone",
+  "planks",
+  "ingot",
+  "soup",
+]
+
 const resourceAmount = ref(1);
-const selectedResource = ref('wood');
+const selectedResource = ref<ResourceType | ResourceFactoriesType>('wood');
 const pricePerUnit = ref(pricesStore.getResourcePrice(selectedResource.value));
 const autoPrice = ref(true);
 

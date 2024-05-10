@@ -7,9 +7,10 @@ import { onMounted, ref, watch, type PropType } from 'vue';
 import { createChart, type IChartApi, type LineData, type ISeriesApi, type UTCTimestamp, TickMarkType } from 'lightweight-charts';
 
 const props = defineProps({
-    foodData: { type: Object as PropType<LineData<UTCTimestamp>[]>, required: true },
-    goldData: { type: Object as PropType<LineData<UTCTimestamp>[]>, required: true },
-    woodData: { type: Object as PropType<LineData<UTCTimestamp>[]>, required: true },
+    resourcesData: {
+        type: Object as PropType<Record<string, LineData<UTCTimestamp>[]>>,
+        required: true,
+    },
     fetchMoreData: {
         type: Function as PropType<() => Promise<boolean>>,
         required: true,
@@ -17,12 +18,9 @@ const props = defineProps({
 });
 
 let chart: IChartApi | null = null;
-let foodSeries: ISeriesApi<'Line'> | null = null;
-let goldSeries: ISeriesApi<'Line'> | null = null;
-let woodSeries: ISeriesApi<'Line'> | null = null;
+const seriesRefs = ref<Record<string, ISeriesApi<'Line'> | null>>({});
 
 const chartContainer = ref<HTMLElement | null>(null);
-
 
 const initChart = () => {
     if (!chartContainer.value) return;
@@ -35,7 +33,6 @@ const initChart = () => {
             secondsVisible: false,
             rightBarStaysOnScroll: true,
             barSpacing: 3,
-            // lockVisibleTimeRangeOnResize: true,
             tickMarkFormatter: (timeRaw: UTCTimestamp, tickMarkType: TickMarkType, locale: string) => {
                 const time = timeRaw * 1000;
                 const date = new Date(time);
@@ -59,27 +56,10 @@ const initChart = () => {
                 }
                 return time;
             },
-
         },
         localization: {
-            // timeFormatter: (time: UTCTimestamp) => {
-            //     const date = new Date(time);
-            //     const hours = date.getUTCHours().toString().padStart(2, '0');
-            //     const minutes = date.getUTCMinutes().toString().padStart(2, '0');
-            //     return `${hours}:${minutes}`;
-            // },
             priceFormatter: (price: number) => price.toFixed(4),
         },
-        // rightPriceScale: {
-        //     mode: PriceScaleMode.Normal,
-        //     autoScale: false,
-        //     ticksVisible: true,
-        //     scaleMargins: {
-        //         top: 0.1,
-        //         bottom: 0.2,
-        //     },
-        //     borderVisible: false,
-        // },
         layout: {
             background: { color: '#fff' },
             textColor: '#333333',
@@ -94,28 +74,16 @@ const initChart = () => {
         },
     });
 
-    foodSeries = chart.addLineSeries({
-        color: 'blue',
-        lineWidth: 2,
-        title: 'Food',
-    });
-    goldSeries = chart.addLineSeries({
-        color: 'gold',
-        lineWidth: 2,
-        title: 'Gold',
-    });
-    woodSeries = chart.addLineSeries({
-        color: 'green',
-        lineWidth: 2,
-        title: 'Wood',
-    });
-
-    foodSeries.setData(props.foodData);
-    goldSeries.setData(props.goldData);
-    woodSeries.setData(props.woodData);
+    for (const resource in props.resourcesData) {
+        seriesRefs.value[resource] = chart.addLineSeries({
+            color: getResourceColor(resource),
+            lineWidth: 2,
+            title: resource,
+        });
+        seriesRefs.value[resource]?.setData(props.resourcesData[resource]);
+    }
 
     chart.timeScale().fitContent();
-
 
     let loadedDataCount = 0;
     let isLoading = false;
@@ -128,7 +96,7 @@ const initChart = () => {
 
         const success = await props.fetchMoreData();
         if (!success) isOver = true;
-        loadedDataCount += props.foodData.length;
+        loadedDataCount += Object.values(props.resourcesData)[0].length;
 
         isLoading = false;
 
@@ -140,23 +108,40 @@ const initChart = () => {
     chart.timeScale().subscribeVisibleLogicalRangeChange((logicalRange) => {
         lastLogicalRange = logicalRange;
         if (!isLoading && logicalRange && logicalRange.from < 0) {
-            console.log('logicalRange', logicalRange)
             loadMoreData();
         }
     });
 };
 
 const updateChart = () => {
-    if (!foodSeries || !goldSeries || !woodSeries) return;
-
-    foodSeries.setData(props.foodData);
-    goldSeries.setData(props.goldData);
-    woodSeries.setData(props.woodData);
+    for (const resource in props.resourcesData) {
+        seriesRefs.value[resource]?.setData(props.resourcesData[resource]);
+    }
 };
 
+const getResourceColor = (resource: string) => {
+    switch (resource) {
+        case 'FOOD':
+            return 'blue';
+        case 'GOLD':
+            return 'gold';
+        case 'WOOD':
+            return 'green';
+        case 'INGOT':
+            return 'gray';
+        case 'PLANKS':
+            return 'brown';
+        case 'SOUP':
+            return 'orange';
+        case 'STONE':
+            return 'darkgray';
+        default:
+            return 'black';
+    }
+};
 
 watch(
-    () => [props.foodData, props.goldData, props.woodData],
+    () => props.resourcesData,
     () => {
         updateChart();
     },

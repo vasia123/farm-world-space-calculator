@@ -6,15 +6,15 @@
         <strong>{{ formatNumber(tonPriceUsd) }}$</strong>
       </div>
       <div class="alert alert-light p-1 fw_topBox token_FWW">
-        <img class="mr-1" src="/img/wood_shadow.png" alt="Wood">
+        <img class="mr-1" src="/img/wood.png" alt="Wood">
         <strong>{{ formatNumber(prices.wood) }}</strong>
       </div>
       <div class="alert alert-light p-1 fw_topBox token_FWF">
-        <img class="mr-1" src="/img/food_shadow.png" alt="Food">
+        <img class="mr-1" src="/img/food.png" alt="Food">
         <strong>{{ formatNumber(prices.food) }}</strong>
       </div>
       <div class="alert alert-light p-1 fw_topBox token_FWG">
-        <img class="mr-1" src="/img/gold_shadow.png" alt="Gold">
+        <img class="mr-1" src="/img/gold.png" alt="Gold">
         <strong>{{ formatNumber(prices.gold) }}</strong>
       </div>
       <button @click="openChartModal" class="btn btn-primary">{{ $t('showCharts') }}</button>

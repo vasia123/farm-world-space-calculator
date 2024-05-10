@@ -32,6 +32,11 @@ export const useAccountsStore = defineStore('accounts', () => {
     const storedAccounts = localStorage.getItem('accounts');
     if (storedAccounts) {
       accounts.value = JSON.parse(storedAccounts);
+      accounts.value?.forEach(account => {
+        account.tools.forEach(tool => {
+          tool.icon = tool.icon.replace('_shadow', '');
+        });
+      });
     } else {
       const storedTools = localStorage.getItem('userTools');
       accounts.value = [

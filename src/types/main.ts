@@ -1,6 +1,7 @@
 
 
 export type ResourceType = 'wood' | 'food' | 'gold'
+export type ResourceFactoriesType = 'planks' | 'soup' | 'ingot' | 'stone'
 
 export interface Tool {
     name: string;

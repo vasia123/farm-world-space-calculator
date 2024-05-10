@@ -24,17 +24,17 @@
                 </td>
                 <td>
                   {{ fn(tool.profit * 24) }}
-                  <img :src="'/farm-world-space-calculator/img/' + String(tool.resource).toLowerCase() + '_shadow.png'"
+                  <img :src="'/farm-world-space-calculator/img/' + String(tool.resource).toLowerCase() + '.png'"
                     width="20px" height="20px" class="mb-1" />
                 </td>
                 <td>
                   <div v-if="tool.energy > 0" class="tool-costs-row">
                     {{ fn(tool.energy / 5 * 24) }}
-                    <img src="/img/food_shadow.png" width="20px" height="20px" class="mb-1" />
+                    <img src="/img/food.png" width="20px" height="20px" class="mb-1" />
                   </div>
                   <div v-if="tool.durability > 0" class="tool-costs-row">
                     {{ fn(tool.durability / 5 * 24) }}
-                    <img src="/img/gold_shadow.png" width="20px" height="20px" class="mb-1" />
+                    <img src="/img/gold.png" width="20px" height="20px" class="mb-1" />
                   </div>
                 </td>
                 <td>
@@ -52,7 +52,7 @@
                   <div v-for="(amount, resource) in summariesStore.getAccountToolsResourceSummary(account.id)"
                     :key="resource" class="tool-costs-row">
                     {{ fn(amount) }}
-                    <img :src="'/farm-world-space-calculator/img/' + resource + '_shadow.png'" width="20px" height="20px"
+                    <img :src="'/farm-world-space-calculator/img/' + resource + '.png'" width="20px" height="20px"
                       class="mb-1" />
                   </div>
                 </td>
@@ -60,7 +60,7 @@
                   <div v-for="(amount, resource) in summariesStore.getAccountToolsConsumptionSummary(account.id)"
                     :key="resource" class="tool-costs-row">
                     {{ fn(amount) }}
-                    <img :src="'/farm-world-space-calculator/img/' + resource + '_shadow.png'" width="20px" height="20px"
+                    <img :src="'/farm-world-space-calculator/img/' + resource + '.png'" width="20px" height="20px"
                       class="mb-1" />
                   </div>
                 </td>
