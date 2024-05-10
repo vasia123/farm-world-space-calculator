@@ -102,8 +102,8 @@
               </div>
             </div>
             <div class="d-block mt-4">
-              <div class="d-inline-block w-80 b-atomic">
-                <div class="d-inline-block w-25 flex-right">
+              <div class="d-inline-block w-100 b-atomic">
+                <div class="d-inline-block w-20 flex-right">
                   <img :src="'/farm-world-space-calculator/img/' + factoryName + '.jpg'" class="img-fluid ml-2">
                   <div>
                     <span class="badge ssm no-shadow">
@@ -112,12 +112,12 @@
                   </div>
                 </div>
 
-                <div class="d-inline-block w-75 b-alcor">
+                <div class="d-inline-block w-80 b-alcor">
                   <div class="d-block fw_craft">
-                    <div class="d-inline-block w-50 text-right">
+                    <div class="d-inline-block w-60 text-right">
                       &nbsp;
                     </div>
-                    <div class="d-inline-block w-50 text-right">
+                    <div class="d-inline-block w-40 text-right">
                       <span class="badge ssm no-shadow">
                         {{ factory.build_slot_cost }} 
                         <img :src="'/farm-world-space-calculator/img/stone.png'" style="height: 16px;">
@@ -125,10 +125,10 @@
                     </div>
                   </div>
                   <div class="d-block fw_craft">
-                    <div class="d-inline-block w-50 text-right">
+                    <div class="d-inline-block w-60 text-right">
                       <span class="badge sm no-shadow">{{ $t('buildSlotCost') }}:</span>
                     </div>
-                    <div class="d-inline-block w-50 text-right">
+                    <div class="d-inline-block w-40 text-right">
                       <span class="badge grey darken-2 sm">
                         {{ formatNumber(factory.build_slot_cost * pricesStore.getResourcePrice('stone')) }}<i
                           class="ton-icon"></i>
@@ -140,12 +140,14 @@
               </div>
             </div>
             <div class="d-block mt-4" v-for="factoryLevel in factory.levels" :key="factoryLevel.level">
-              <div class="d-inline-block w-50 b-atomic">
+              <div class="d-inline-block w-50 b-atomic pt-4">
                 
-                <div class="d-inline-block w-25 flex-right">
-                  {{ $t('level') }} {{ factoryLevel.level }} 
+                <div class="d-inline-block w-30 no-wrap flex-right pt-4">
+                  <span class="badge sm no-shadow">
+                    {{ $t('level') }}<br>{{ factoryLevel.level }} 
+                  </span>
                 </div>
-                <div class="d-inline-block w-75 flex-right vtop">
+                <div class="d-inline-block w-70 flex-right vtop">
                   <div class="d-block">
                     <span class="badge sm no-shadow">{{ $t('dailyProfit') }}:</span>
                     <span class="badge sm ml-1" :class="{

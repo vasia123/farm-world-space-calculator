@@ -1,6 +1,6 @@
 <template>
   <div class="resources-container useful-tools-container">
-    <div class="col-lg-4 col-md-6 col-sm-12 mb-4 text-center useful-tool-item">
+    <div class="col-lg-4 col-md-6 col-sm-12 mb-4 pl-2 text-center useful-tool-item">
       <div class="card card-cascade wider">
         <div class="view view-cascade grey darken-3">
           <div class="m-1">
