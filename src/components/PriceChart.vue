@@ -22,6 +22,26 @@ const seriesRefs = ref<Record<string, ISeriesApi<'Line'> | null>>({});
 
 const chartContainer = ref<HTMLElement | null>(null);
 
+let loadedDataCount = 0;
+let isLoading = false;
+let lastLogicalRange: { from: number; to: number } | null = null;
+let isOver = false;
+
+const loadMoreData = async () => {
+    if (isLoading || isOver) return;
+    isLoading = true;
+
+    const success = await props.fetchMoreData();
+    if (!success) isOver = true;
+    loadedDataCount += Object.values(props.resourcesData)[0].length;
+
+    isLoading = false;
+
+    if (lastLogicalRange && lastLogicalRange.to > loadedDataCount || loadedDataCount === 0) {
+        loadMoreData();
+    }
+};
+
 const initChart = () => {
     if (!chartContainer.value) return;
 
@@ -75,35 +95,20 @@ const initChart = () => {
     });
 
     for (const resource in props.resourcesData) {
+        const sortedData = props.resourcesData[resource].slice().filter(a => a.value).sort((a, b) => a.time - b.time);
         seriesRefs.value[resource] = chart.addLineSeries({
             color: getResourceColor(resource),
             lineWidth: 2,
             title: resource,
         });
-        seriesRefs.value[resource]?.setData(props.resourcesData[resource]);
+        if (sortedData.length === 0) {
+            loadMoreData();
+        } else {
+            seriesRefs.value[resource]?.setData(sortedData);
+        }
     }
 
     chart.timeScale().fitContent();
-
-    let loadedDataCount = 0;
-    let isLoading = false;
-    let lastLogicalRange: { from: number; to: number } | null = null;
-    let isOver = false;
-
-    const loadMoreData = async () => {
-        if (isLoading || isOver) return;
-        isLoading = true;
-
-        const success = await props.fetchMoreData();
-        if (!success) isOver = true;
-        loadedDataCount += Object.values(props.resourcesData)[0].length;
-
-        isLoading = false;
-
-        if (lastLogicalRange && lastLogicalRange.to > loadedDataCount) {
-            loadMoreData();
-        }
-    };
 
     chart.timeScale().subscribeVisibleLogicalRangeChange((logicalRange) => {
         lastLogicalRange = logicalRange;
@@ -115,7 +120,12 @@ const initChart = () => {
 
 const updateChart = () => {
     for (const resource in props.resourcesData) {
-        seriesRefs.value[resource]?.setData(props.resourcesData[resource]);
+        const sortedData = props.resourcesData[resource].slice().filter(a => a.value).sort((a, b) => a.time - b.time);
+        if (sortedData.length === 0) {
+            loadMoreData();
+        } else {
+            seriesRefs.value[resource]?.setData(sortedData);
+        }
     }
 };
 

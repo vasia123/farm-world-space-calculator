@@ -21,7 +21,7 @@
   <Footer />
   <AddToolModal />
   <SettingsMenu />
-  <PriceChartModal v-if="modalsStore.showChartModal" />
+  <PriceChartModal />
 </template>
 
 <script setup lang="ts">
@@ -29,7 +29,6 @@ import { computed, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAccountsStore } from '@/stores/accounts';
 import { usePricesStore } from '@/stores/prices';
-import { useModalsStore } from '@/stores/modals';
 import { useSettingsStore } from '@/stores/settings';
 import Navbar from '@/components/NavBar.vue';
 import AccountList from '@/components/AccountList.vue';
@@ -43,7 +42,6 @@ import StackPriceCalculator from '@/components/StackPriceCalculator.vue';
 const { t: $t } = useI18n();
 const accountsStore = useAccountsStore();
 const pricesStore = usePricesStore();
-const modalsStore = useModalsStore();
 const settingsStore = useSettingsStore();
 
 const serverError = computed(() => settingsStore.serverError);

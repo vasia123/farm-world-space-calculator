@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showModal" class="modal chart-modal">
+  <div v-show="showModal" class="modal chart-modal">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -65,7 +65,7 @@ const showModal = computed(() => modalsStore.showChartModal);
 const chartPrices = computed(() => chartStore.chartPrices);
 const chartError = computed(() => chartStore.chartError);
 
-const selectedResourcesType = ref<'simple' | 'factories'>('simple');
+const selectedResourcesType = ref<'simple' | 'factories' | ''>('');
 
 async function fetchMoreData() {
   return await chartStore.fetchMoreData();
