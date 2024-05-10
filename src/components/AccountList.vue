@@ -90,7 +90,10 @@
                   <th>{{ $t('roi') }}</th>
                 </tr>
                 <tr v-for="buff in buffsStore.buffs" :key="buff.name" class="tool-row">
-                  <td>{{ $t(buff.name) }}</td>
+                  <td class="text-left pl-2">
+                    <img :src="'/farm-world-space-calculator/img/' + buff.name + '.png'" width="20px" height="20px" class="mb-1" />
+                    {{ $t(buff.name) }}
+                  </td>
                   <td>
                     <div v-for="(amount, resource) in buff.cost" :key="resource" class="tool-costs-row">
                       {{ amount }}
