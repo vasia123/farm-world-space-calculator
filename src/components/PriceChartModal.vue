@@ -18,6 +18,7 @@
                 <img src="/img/wood.png" width="40px" height="40px" />
                 <img src="/img/food.png" width="40px" height="40px" />
                 <img src="/img/gold.png" width="40px" height="40px" />
+                <img src="/img/stone.png" width="40px" height="40px" />
               </button>
               <button type="button" class="chart-button btn btn-link"
                 :class="{ 'chart-button-active': selectedResourcesType === 'factories' }"
@@ -25,7 +26,6 @@
                 <img src="/img/planks.png" width="40px" height="40px" />
                 <img src="/img/soup.png" width="40px" height="40px" />
                 <img src="/img/ingot.png" width="40px" height="40px" />
-                <img src="/img/stone.png" width="40px" height="40px" />
               </button>
             </div>
             <div class="chart-container" v-if="selectedResourcesType === 'simple'">
@@ -33,6 +33,7 @@
                 FOOD: chartStore.foodData,
                 GOLD: chartStore.goldData,
                 WOOD: chartStore.woodData,
+                STONE: chartStore.StoneData,
               }" :fetch-more-data="fetchMoreData" />
             </div>
             <div class="chart-container" v-if="selectedResourcesType === 'factories'">
@@ -40,7 +41,6 @@
                 INGOT: chartStore.IngotData,
                 PLANKS: chartStore.PlanksData,
                 SOUP: chartStore.SoupData,
-                STONE: chartStore.StoneData,
               }" :fetch-more-data="fetchMoreData" />
             </div>
           </div>
