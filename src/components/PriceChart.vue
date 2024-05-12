@@ -7,6 +7,7 @@ import { onMounted, ref, watch, type PropType } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { createChart, TickMarkType } from 'lightweight-charts';
 import type { IChartApi, LineData, ISeriesApi, UTCTimestamp } from 'lightweight-charts';
+import { formatNumber } from '@/shared/utils';
 
 const { t: $t } = useI18n();
 
@@ -82,7 +83,7 @@ const initChart = () => {
             },
         },
         localization: {
-            priceFormatter: (price: number) => price.toFixed(4),
+            priceFormatter: (price: number) => formatNumber(price),
         },
         layout: {
             background: { color: '#fff' },
