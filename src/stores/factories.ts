@@ -4,7 +4,7 @@ import type { ResourceType, ResourceFactoriesType } from '@/types/main';
 
 export const useFactoriesStore = defineStore('factories', () => {
     type FactoryLevelPrice = {
-        [key in ResourceFactoriesType]: number;
+        [key in ResourceFactoriesType | ResourceType]?: number;
     };
 
     type FactoryLevel = {
@@ -33,10 +33,9 @@ export const useFactoriesStore = defineStore('factories', () => {
                 {
                     level: 1,
                     up_level_price: {
-                        planks: 10,
-                        soup: 5,
-                        ingot: 5,
-                        stone: 500
+                        wood: 31200,
+                        gold: 5200,
+                        stone: 1000
                     },
                     craft_recipe: {
                         wood: 1000
@@ -105,10 +104,9 @@ export const useFactoriesStore = defineStore('factories', () => {
                 {
                     level: 1,
                     up_level_price: {
-                        planks: 5,
-                        soup: 10,
-                        ingot: 5,
-                        stone: 500
+                        wood: 25200,
+                        gold: 4200,
+                        stone: 1000
                     },
                     craft_recipe: {
                         food: 1000
@@ -177,10 +175,9 @@ export const useFactoriesStore = defineStore('factories', () => {
                 {
                     level: 1,
                     up_level_price: {
-                        planks: 5,
-                        soup: 5,
-                        ingot: 10,
-                        stone: 500
+                        wood: 14400,
+                        gold: 6000,
+                        stone: 2000
                     },
                     craft_recipe: {
                         gold: 1000

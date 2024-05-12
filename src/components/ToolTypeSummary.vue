@@ -180,7 +180,7 @@
                   </div>
                   <div class="d-inline-block w-50 text-right">
                     <span class="badge ssm no-shadow">
-                      {{ formatNumber(resourceAmount * pricesStore.getResourcePrice(resource)) }}<i class="ton-icon"></i>
+                      {{ formatNumber((resourceAmount || 0) * pricesStore.getResourcePrice(resource)) }}<i class="ton-icon"></i>
                     </span>
                   </div>
                 </div>

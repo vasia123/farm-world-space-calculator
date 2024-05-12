@@ -75,7 +75,7 @@
                 </td>
               </tr>
             </table>
-              <div class="text-center mt-2 mb-0 font-weight-bolder">
+              <!-- <div class="text-center mt-2 mb-0 font-weight-bolder">
                 {{  $t('buffs_roi') }}
               </div>
               <div class="text-center mb-2 font-weight-bolder font-">
@@ -110,7 +110,7 @@
                     {{ $t('days') }}
                   </td>
                 </tr>
-              </table>
+              </table> -->
           </div>
         </div>
       </div>
