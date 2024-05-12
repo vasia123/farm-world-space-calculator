@@ -16,7 +16,9 @@ export const useChartStore = defineStore('chart', () => {
     date_update: number;
   }[]>([]);
   const chartError = ref(false);
-  const currentDate = ref(new Date());
+  const nextDate = new Date();
+  nextDate.setDate(nextDate.getDate() + 2);
+  const currentDate = ref(nextDate);
   const chartCache = ref<Record<string, { data: typeof chartPrices.value; timestamp: number }>>({});
 
   async function fetchChartPrices(): Promise<boolean> {
@@ -25,20 +27,25 @@ export const useChartStore = defineStore('chart', () => {
     const day = String(currentDate.value.getDate()).padStart(2, '0');
     const cacheKey = `${year}-${month}-${day}`;
 
-    if (chartCache.value[cacheKey]) {
-      const cachedData = chartCache.value[cacheKey];
-      const now = Date.now();
-      const cacheAge = (now - cachedData.timestamp) / 1000; // Cache age in seconds
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
-      if (cacheAge < 300) { // Cache is valid for 5 minutes (300 seconds)
-        chartPrices.value = [...cachedData.data, ...chartPrices.value];
-        chartError.value = false;
-        return true;
+    if (currentDate.value <= twoDaysAgo) {
+      const cachedData = localStorage.getItem(cacheKey);
+      if (cachedData) {
+        const { data, timestamp } = JSON.parse(cachedData);
+        const now = Date.now();
+        const cacheAge = (now - timestamp) / 1000; // Cache age in seconds
+        if (cacheAge < 300) {
+          // Cache is valid for 5 minutes (300 seconds)
+          chartPrices.value = [...data, ...chartPrices.value];
+          chartError.value = false;
+          return true;
+        }
       }
     }
 
     const url = `https://vasia123.github.io/farm-world-space-prices/${year}-${month}/${day}.json`;
-
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -48,18 +55,18 @@ export const useChartStore = defineStore('chart', () => {
       chartPrices.value = [...data, ...chartPrices.value];
       chartError.value = false;
 
-      chartCache.value[cacheKey] = {
-        data: data,
-        timestamp: Date.now()
-      };
+      if (currentDate.value <= twoDaysAgo) {
+        localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: Date.now() }));
+      }
 
       return true;
     } catch (error) {
-      console.error('Error fetching chart prices:', error);
-      chartError.value = true;
+      // console.error('Error fetching chart prices:', error);
+      // chartError.value = true;
       return false;
     }
   }
+
 
   const foodData = computed(() =>
     chartPrices.value.map(price => ({
@@ -110,13 +117,14 @@ export const useChartStore = defineStore('chart', () => {
     }))
   );
 
-  async function fetchMoreData() {
+  async function fetchMoreData(): Promise<boolean> {
     const prevDate = new Date(currentDate.value);
     prevDate.setDate(prevDate.getDate() - 1);
 
-    if (prevDate >= new Date(2023, 3, 19)) {
+    if (prevDate >= new Date(2024, 3, 19)) {
       currentDate.value = prevDate;
-      return fetchChartPrices();
+      const result = await fetchChartPrices();
+      return result ? true : fetchMoreData();
     }
     return false;
   }

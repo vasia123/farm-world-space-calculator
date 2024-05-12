@@ -8,16 +8,13 @@ import { useI18n } from 'vue-i18n';
 import { createChart, TickMarkType } from 'lightweight-charts';
 import type { IChartApi, LineData, ISeriesApi, UTCTimestamp } from 'lightweight-charts';
 import { formatNumber } from '@/shared/utils';
+import { useChartStore } from '@/stores/chart';
 
 const { t: $t } = useI18n();
 
 const props = defineProps({
     resourcesData: {
         type: Object as PropType<Record<string, LineData<UTCTimestamp>[]>>,
-        required: true,
-    },
-    fetchMoreData: {
-        type: Function as PropType<() => Promise<boolean>>,
         required: true,
     },
 });
@@ -32,11 +29,13 @@ let isLoading = false;
 let lastLogicalRange: { from: number; to: number } | null = null;
 let isOver = false;
 
+const chartStore = useChartStore();
+
 const loadMoreData = async () => {
     if (isLoading || isOver) return;
     isLoading = true;
 
-    const success = await props.fetchMoreData();
+    const success = await chartStore.fetchMoreData();
     if (!success) isOver = true;
     loadedDataCount += Object.values(props.resourcesData)[0].length;
 

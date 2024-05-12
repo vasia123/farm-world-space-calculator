@@ -30,18 +30,18 @@
             </div>
             <div class="chart-container" v-if="selectedResourcesType === 'simple'">
               <PriceChart :resources-data="{
-                FOOD: chartStore.foodData,
-                GOLD: chartStore.goldData,
-                WOOD: chartStore.woodData,
-                STONE: chartStore.StoneData,
-              }" :fetch-more-data="fetchMoreData" />
+    FOOD: chartStore.foodData,
+    GOLD: chartStore.goldData,
+    WOOD: chartStore.woodData,
+    STONE: chartStore.StoneData,
+  }" />
             </div>
             <div class="chart-container" v-if="selectedResourcesType === 'factories'">
               <PriceChart :resources-data="{
-                INGOT: chartStore.IngotData,
-                PLANKS: chartStore.PlanksData,
-                SOUP: chartStore.SoupData,
-              }" :fetch-more-data="fetchMoreData" />
+    INGOT: chartStore.IngotData,
+    PLANKS: chartStore.PlanksData,
+    SOUP: chartStore.SoupData,
+  }" />
             </div>
           </div>
         </div>
@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useModalsStore } from '@/stores/modals';
 import { useChartStore } from '@/stores/chart';
@@ -67,9 +67,6 @@ const chartError = computed(() => chartStore.chartError);
 
 const selectedResourcesType = ref<'simple' | 'factories' | ''>('');
 
-async function fetchMoreData() {
-  return await chartStore.fetchMoreData();
-}
 
 function closeModal() {
   modalsStore.closeChartModal();
@@ -78,19 +75,6 @@ function closeModal() {
 function chooseResourcesGraph(type: 'simple' | 'factories') {
   selectedResourcesType.value = type;
 }
-
-onMounted(async () => {
-  if (showModal.value) {
-    const result = await chartStore.fetchChartPrices();
-    if (!result) {
-      const prevDate = new Date(chartStore.currentDate);
-      prevDate.setDate(prevDate.getDate() - 1);
-      chartStore.currentDate = prevDate;
-      chartStore.chartPrices = [];
-      await chartStore.fetchChartPrices();
-    }
-  }
-});
 </script>
 
 
