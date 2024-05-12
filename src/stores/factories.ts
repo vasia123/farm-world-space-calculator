@@ -175,7 +175,7 @@ export const useFactoriesStore = defineStore('factories', () => {
                 {
                     level: 1,
                     up_level_price: {
-                        wood: 14400,
+                        wood: 36000,
                         gold: 6000,
                         stone: 2000
                     },
@@ -274,24 +274,24 @@ export const useFactoriesStore = defineStore('factories', () => {
     function getFactoryUpgradeCost(factoryName: keyof typeof factories, level: number): number {
         const factoryLevel = factories[factoryName].levels[level - 1];
         let totalCost = 0;
-    
+
         for (const [resource, cost] of Object.entries(factoryLevel.up_level_price)) {
             totalCost += cost * pricesStore.getResourcePrice(resource as ResourceFactoriesType);
         }
-    
+
         return totalCost;
     }
-    
+
     function getFactoryTotalUpgradeCost(factoryName: keyof typeof factories, level: number): number {
         let totalCost = factories[factoryName].build_slot_cost * pricesStore.getResourcePrice('stone');
-    
+
         for (let i = 0; i < level; i++) {
             const factoryLevel = factories[factoryName].levels[i];
             for (const [resource, cost] of Object.entries(factoryLevel.up_level_price)) {
                 totalCost += cost * pricesStore.getResourcePrice(resource as ResourceFactoriesType);
             }
         }
-    
+
         return totalCost;
     }
 
@@ -315,10 +315,10 @@ export const useFactoriesStore = defineStore('factories', () => {
     function getFactoryROI(factoryName: keyof typeof factories, level: number): { hours: number; days: number } {
         const totalUpgradeCost = getFactoryTotalUpgradeCost(factoryName, level);
         const dailyProfit = getFactoryDailyProfit(factoryName, level);
-    
+
         const roiDays = totalUpgradeCost / dailyProfit;
         const roiHours = roiDays * 24;
-    
+
         return { hours: roiHours, days: roiDays };
     }
 
