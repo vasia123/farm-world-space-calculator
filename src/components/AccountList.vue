@@ -69,13 +69,13 @@
                 </td>
                 <td>
                   {{ $t('roi') }}: <span class="badge grey darken-2 sm ml-1">{{
-                    summariesStore.getUserToolsROI(account.id).toFixed(1)
-                  }}</span>
+      summariesStore.getUserToolsROI(account.id).toFixed(1)
+    }}</span>
                   {{ $t('days') }}
                 </td>
               </tr>
             </table>
-              <!-- <div class="text-center mt-2 mb-0 font-weight-bolder">
+            <!-- <div class="text-center mt-2 mb-0 font-weight-bolder">
                 {{  $t('buffs_roi') }}
               </div>
               <div class="text-center mb-2 font-weight-bolder font-">
@@ -142,7 +142,7 @@
     </div>
   </div>
 </template>
-  
+
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';

@@ -12,6 +12,12 @@
                     <img :src="'/farm-world-space-calculator/img/' + String(resource).toLowerCase() + '.png'">
                     <span class="badge darken-3 md no-shadow">
                       {{ formatNumber(pricesStore.getResourcePrice(resource)) }} <i class="ton-icon"></i>
+                      <span class="badge ssm" :class="{
+        'green lighten-1': pricesStore.getPriceChangePercentage(resource).includes('+'),
+        'red lighten-1': !pricesStore.getPriceChangePercentage(resource).includes('+')
+      }">
+                        {{ pricesStore.getPriceChangePercentage(resource) }}
+                      </span>
                     </span>
                   </div>
                 </div>
@@ -25,9 +31,9 @@
                     <div class="d-block">
                       <span class="badge sm no-shadow">{{ $t('dailyProfit') }}:</span>
                       <span class="badge sm ml-1" :class="{
-                        'gradbg-lime2': toolsStore.getToolDailyProfit(tool) > 0,
-                        'gradbg-red': toolsStore.getToolDailyProfit(tool) < 0,
-                      }">
+        'gradbg-lime2': toolsStore.getToolDailyProfit(tool) > 0,
+        'gradbg-red': toolsStore.getToolDailyProfit(tool) < 0,
+      }">
                         {{ formatNumber(toolsStore.getToolDailyProfit(tool)) }}<i class="ton-icon"></i>
                       </span>
                     </div>
@@ -35,8 +41,8 @@
                       <span class="ml-3 badge sm no-shadow">{{ $t('roi') }}:</span>
                       <span class="badge grey darken-2 sm ml-1">
                         {{ toolsStore.getToolDailyProfit(tool) > 0
-                          ? toolsStore.getToolROI(tool, toolsStore.getToolCraftCost(tool)).days.toFixed(1)
-                          : '🤷‍♂️'
+        ? toolsStore.getToolROI(tool, toolsStore.getToolCraftCost(tool)).days.toFixed(1)
+        : '🤷‍♂️'
                         }}
                       </span>
                       {{ $t('days') }}
@@ -97,6 +103,12 @@
                   <img :src="'/farm-world-space-calculator/img/' + factory.resource + '.png'">
                   <span class="badge darken-3 md no-shadow">
                     {{ formatNumber(pricesStore.getResourcePrice(factory.resource)) }} <i class="ton-icon"></i>
+                    <span class="badge ssm" :class="{
+        'green lighten-1': pricesStore.getPriceChangePercentage(factory.resource).includes('+'),
+        'red lighten-1': !pricesStore.getPriceChangePercentage(factory.resource).includes('+')
+      }">
+                      {{ pricesStore.getPriceChangePercentage(factory.resource) }}
+                    </span>
                   </span>
                 </div>
               </div>
@@ -107,7 +119,7 @@
                   <img :src="'/farm-world-space-calculator/img/' + factoryName + '.jpg'" class="img-fluid ml-2">
                   <div>
                     <span class="badge ssm no-shadow">
-                      {{$t(factoryName)}}
+                      {{ $t(factoryName) }}
                     </span>
                   </div>
                 </div>
@@ -119,7 +131,7 @@
                     </div>
                     <div class="d-inline-block w-40 text-right">
                       <span class="badge ssm no-shadow">
-                        {{ factory.build_slot_cost }} 
+                        {{ factory.build_slot_cost }}
                         <img :src="'/farm-world-space-calculator/img/stone.png'" style="height: 16px;">
                       </span>
                     </div>
@@ -141,19 +153,19 @@
             </div>
             <div class="d-block mt-4" v-for="factoryLevel in factory.levels" :key="factoryLevel.level">
               <div class="d-inline-block w-50 b-atomic pt-4">
-                
+
                 <div class="d-inline-block w-30 no-wrap flex-right pt-4">
                   <span class="badge sm no-shadow">
-                    {{ $t('level') }}<br>{{ factoryLevel.level }} 
+                    {{ $t('level') }}<br>{{ factoryLevel.level }}
                   </span>
                 </div>
                 <div class="d-inline-block w-70 flex-right vtop">
                   <div class="d-block">
                     <span class="badge sm no-shadow">{{ $t('dailyProfit') }}:</span>
                     <span class="badge sm ml-1" :class="{
-                      'gradbg-lime2': factoriesStore.getFactoryDailyProfit(factoryName, factoryLevel.level) > 0,
-                      'gradbg-red': factoriesStore.getFactoryDailyProfit(factoryName, factoryLevel.level) < 0,
-                    }">
+        'gradbg-lime2': factoriesStore.getFactoryDailyProfit(factoryName, factoryLevel.level) > 0,
+        'gradbg-red': factoriesStore.getFactoryDailyProfit(factoryName, factoryLevel.level) < 0,
+      }">
                       {{ formatNumber(factoriesStore.getFactoryDailyProfit(factoryName, factoryLevel.level)) }}<i
                         class="ton-icon"></i>
                     </span>
@@ -162,8 +174,8 @@
                     <span class="ml-3 badge sm no-shadow">{{ $t('roi') }}:</span>
                     <span class="badge grey darken-2 sm ml-1">
                       {{ factoriesStore.getFactoryDailyProfit(factoryName, factoryLevel.level) > 0
-                        ? factoriesStore.getFactoryROI(factoryName, factoryLevel.level).days.toFixed(1)
-                        : '🤷‍♂️'
+        ? factoriesStore.getFactoryROI(factoryName, factoryLevel.level).days.toFixed(1)
+        : '🤷‍♂️'
                       }}
                     </span>
                     {{ $t('days') }}
@@ -180,7 +192,8 @@
                   </div>
                   <div class="d-inline-block w-50 text-right">
                     <span class="badge ssm no-shadow">
-                      {{ formatNumber((resourceAmount || 0) * pricesStore.getResourcePrice(resource)) }}<i class="ton-icon"></i>
+                      {{ formatNumber((resourceAmount || 0) * pricesStore.getResourcePrice(resource)) }}<i
+                        class="ton-icon"></i>
                     </span>
                   </div>
                 </div>
@@ -203,7 +216,7 @@
     </div>
   </div>
 </template>
-  
+
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';

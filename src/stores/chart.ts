@@ -7,40 +7,36 @@ export const useChartStore = defineStore('chart', () => {
     FOOD: string;
     GOLD: string;
     WOOD: string;
-
     INGOT: string;
     PLANKS: string;
     SOUP: string;
     STONE: string;
-
     date_update: number;
   }[]>([]);
   const chartError = ref(false);
-  const nextDate = new Date();
-  nextDate.setDate(nextDate.getDate() + 2);
-  const currentDate = ref(nextDate);
-  const chartCache = ref<Record<string, { data: typeof chartPrices.value; timestamp: number }>>({});
+  const currentDate = ref(new Date());
 
-  async function fetchChartPrices(): Promise<boolean> {
-    const year = currentDate.value.getFullYear();
-    const month = String(currentDate.value.getMonth() + 1).padStart(2, '0');
-    const day = String(currentDate.value.getDate()).padStart(2, '0');
+  async function fetchChartPrices(date: Date): Promise<typeof chartPrices.value> {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
     const cacheKey = `${year}-${month}-${day}`;
 
     const twoDaysAgo = new Date();
     twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
-    if (currentDate.value <= twoDaysAgo) {
-      const cachedData = localStorage.getItem(cacheKey);
-      if (cachedData) {
-        const { data, timestamp } = JSON.parse(cachedData);
-        const now = Date.now();
-        const cacheAge = (now - timestamp) / 1000; // Cache age in seconds
+    const cachedData = localStorage.getItem(cacheKey);
+    if (cachedData) {
+      const { data, timestamp } = JSON.parse(cachedData);
+      const now = Date.now();
+      const cacheAge = (now - timestamp) / 1000; // Cache age in seconds
+      if (date > twoDaysAgo) {
         if (cacheAge < 300) {
-          // Cache is valid for 5 minutes (300 seconds)
-          chartPrices.value = [...data, ...chartPrices.value];
-          chartError.value = false;
-          return true;
+          return data;
+        }
+      } else {
+        if (cacheAge < 31536000) {
+          return data;
         }
       }
     }
@@ -52,21 +48,13 @@ export const useChartStore = defineStore('chart', () => {
         throw new Error('Failed to fetch chart prices');
       }
       const data = await response.json();
-      chartPrices.value = [...data, ...chartPrices.value];
-      chartError.value = false;
-
-      if (currentDate.value <= twoDaysAgo) {
-        localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: Date.now() }));
-      }
-
-      return true;
+      localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: Date.now() }));
+      return data;
     } catch (error) {
-      // console.error('Error fetching chart prices:', error);
-      // chartError.value = true;
-      return false;
+      console.error('Error fetching chart prices:', error);
+      return [];
     }
   }
-
 
   const foodData = computed(() =>
     chartPrices.value.map(price => ({
@@ -123,8 +111,9 @@ export const useChartStore = defineStore('chart', () => {
 
     if (prevDate >= new Date(2024, 3, 19)) {
       currentDate.value = prevDate;
-      const result = await fetchChartPrices();
-      return result ? true : fetchMoreData();
+      const result = await fetchChartPrices(currentDate.value);
+      chartPrices.value = [...result, ...chartPrices.value];
+      return result.length > 0;
     }
     return false;
   }
@@ -133,9 +122,7 @@ export const useChartStore = defineStore('chart', () => {
     chartPrices,
     chartError,
     currentDate,
-    chartCache,
     fetchChartPrices,
-
     foodData,
     goldData,
     woodData,
@@ -143,7 +130,6 @@ export const useChartStore = defineStore('chart', () => {
     PlanksData,
     SoupData,
     StoneData,
-
     fetchMoreData
   };
 });

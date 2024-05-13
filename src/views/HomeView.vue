@@ -66,6 +66,7 @@ onMounted(() => {
   window.addEventListener('beforeunload', () => {
     window.clearTimeout(reloadTimeout);
   });
+  pricesStore.loadPricesForThreeDays();
 });
 
 onUnmounted(() => {

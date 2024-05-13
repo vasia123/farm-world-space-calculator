@@ -1,11 +1,21 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { useSettingsStore } from '@/stores/settings'
+import { useSettingsStore } from '@/stores/settings';
 import type { ResourceType, ResourceFactoriesType } from '@/types/main';
+import { useChartStore } from './chart';
 
 export const usePricesStore = defineStore('prices', () => {
-  type Prices = { [key in ResourceType | ResourceFactoriesType]: number }
+  type Prices = { [key in ResourceType | ResourceFactoriesType]: number };
   const prices = ref<Prices>({
+    wood: 0.00,
+    food: 0.00,
+    gold: 0.00,
+    ingot: 0.00,
+    planks: 0.00,
+    soup: 0.00,
+    stone: 0.00,
+  });
+  const prevDayAveragePrices = ref<Prices>({
     wood: 0.00,
     food: 0.00,
     gold: 0.00,
@@ -18,7 +28,8 @@ export const usePricesStore = defineStore('prices', () => {
   let priceTimeout: number;
   let priceTonTimeout: number;
 
-  const settingsStore = useSettingsStore()
+  const settingsStore = useSettingsStore();
+  const chartStore = useChartStore();
 
   async function fetchPrices() {
     try {
@@ -38,12 +49,42 @@ export const usePricesStore = defineStore('prices', () => {
     }
   }
 
+  async function loadPricesForThreeDays() {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const twoDaysAgo = new Date(today);
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+
+    const pricesPromises = [
+      chartStore.fetchChartPrices(tomorrow),
+      chartStore.fetchChartPrices(today),
+      chartStore.fetchChartPrices(yesterday),
+      chartStore.fetchChartPrices(twoDaysAgo),
+    ];
+
+    const pricesDataAll = await Promise.all(pricesPromises);
+    const pricesData = pricesDataAll.filter(prices => prices.length > 0).sort((a, b) => a[0].date_update - b[0].date_update);
+
+    if (pricesData.length > 0) {
+      const prevDayPrices = pricesData[pricesData.length - 1];
+      const resourceTypes: (ResourceType | ResourceFactoriesType)[] = ['wood', 'food', 'gold', 'ingot', 'planks', 'soup', 'stone'];
+      resourceTypes.forEach(resource => {
+        const prices = prevDayPrices.map((item: any) => parseFloat(item[resource.toUpperCase()])).filter(price => price > 0);
+        const averagePrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
+        prevDayAveragePrices.value[resource] = averagePrice;
+      });
+    }
+  }
+
   function getResourcePrice(resource: ResourceType | ResourceFactoriesType): number {
     return prices.value[resource] || 0;
   }
 
   function setManualPrices() {
-    settingsStore.setState('local')
+    settingsStore.setState('local');
     window.clearTimeout(priceTimeout);
   }
 
@@ -54,21 +95,24 @@ export const usePricesStore = defineStore('prices', () => {
   function saveResourcesPrices() {
     localStorage.setItem('resourcesPrices', JSON.stringify(prices.value));
   }
+
   function loadResourcesPrices(): Prices | null {
     const storedPrices = localStorage.getItem('resourcesPrices');
     if (storedPrices) {
       try {
-        return JSON.parse(storedPrices)
+        return JSON.parse(storedPrices);
       } catch (error) {
         // 
       }
     }
     return null;
   }
+
   function loadTonPrice(): number | string | null {
     const storedPrice = localStorage.getItem('tonPrice');
     return storedPrice ? storedPrice : null;
   }
+
   async function fetchTonPrice() {
     try {
       const response = await fetch('https://tonapi.io/v2/rates?tokens=ton&currencies=usd');
@@ -83,6 +127,7 @@ export const usePricesStore = defineStore('prices', () => {
     }
     priceTonTimeout = setInterval(fetchTonPrice, 5 * 60 * 1000);
   }
+
   async function startPricesTimers() {
     const storedPrices = loadResourcesPrices();
     if (storedPrices) {
@@ -104,19 +149,32 @@ export const usePricesStore = defineStore('prices', () => {
       fetchTonPrice();
     }
   }
+
   async function stopPricesTimers() {
     window.clearTimeout(priceTimeout);
     window.clearInterval(priceTonTimeout);
+  }
+
+  function getPriceChangePercentage(resource: ResourceType | ResourceFactoriesType): string {
+    const currentPrice = prices.value[resource];
+    const prevDayAveragePrice = prevDayAveragePrices.value[resource];
+    if (prevDayAveragePrice === 0) {
+      return '';
+    }
+    const changePercentage = ((currentPrice - prevDayAveragePrice) / prevDayAveragePrice) * 100;
+    return changePercentage >= 0 ? `+${changePercentage.toFixed(1)}%` : `${changePercentage.toFixed(1)}%`;
   }
 
   return {
     prices,
     tonPriceUsd,
     fetchPrices,
+    loadPricesForThreeDays,
     fetchTonPrice,
     getResourcePrice,
     startPricesTimers,
     setManualPrices,
     stopPricesTimers,
+    getPriceChangePercentage,
   };
 });
