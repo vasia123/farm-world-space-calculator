@@ -14,7 +14,9 @@ export const useChartStore = defineStore('chart', () => {
     date_update: number;
   }[]>([]);
   const chartError = ref(false);
-  const currentDate = ref(new Date());
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const currentDate = ref(tomorrow);
 
   async function fetchChartPrices(date: Date): Promise<typeof chartPrices.value> {
     const year = date.getFullYear();
