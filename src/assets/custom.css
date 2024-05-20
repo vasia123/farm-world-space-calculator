@@ -201,7 +201,10 @@ a,
   border-radius: 50%;
   width: 12px;
   height: 12px;
-  line-height: 11px;
+  line-height: 10px;
+  margin: 0 auto;
+}
+.factory-cell-level--float {
   position: absolute;
   left: 50%;
   margin-left: -10px;

@@ -48,7 +48,7 @@
                 <td class="factory-cell-img">
                   <img :src="`/farm-world-space-calculator/img/${factory.name}.jpg`" :alt="factory.name" class="mr-2"
                     width="20px">
-                  <div class="factory-cell-level mr-2">{{ factory.level.level }}</div>
+                  <div class="factory-cell-level factory-cell-level--float mr-2">{{ factory.level.level }}</div>
                 </td>
                 <td>
                   {{ fn(factory.level.result_craft) }}
@@ -95,7 +95,7 @@
                 <td>
                   {{ $t('roi') }}: <span class="badge grey darken-2 sm ml-1">{{
                     summariesStore.getAccountROI(account.id).toFixed(1)
-                    }}</span>
+                  }}</span>
                   {{ $t('days') }}
                 </td>
               </tr>
