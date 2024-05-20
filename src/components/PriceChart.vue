@@ -82,7 +82,7 @@ const initChart = () => {
             },
         },
         localization: {
-            priceFormatter: (price: number) => formatNumber(price),
+            priceFormatter: (price: number) => formatNumber(price, 3),
         },
         layout: {
             background: { color: '#fff' },

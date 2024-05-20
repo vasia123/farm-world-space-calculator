@@ -29,12 +29,16 @@
           </div>
           <div class="form-group">
             <label for="resourceType">{{ $t('resourceType') }}</label>
-            <select id="resourceType" class="form-control" v-model="selectedResource">
-              <option v-for="resource in resources" :value="resource" :key="resource">
-                <img :src="`/farm-world-space-calculator/img/${resource}.png`" style="height: 16px;">
-                {{ $t(resource) }}
-              </option>
-            </select>
+            <div class="icon-resource-select-wrapper">
+              <div v-for="resource in resources" :key="resource" class="icon-resource-select-row" :class="{
+                'icon-resource-select-row--active': selectedResource === resource
+              }" @click="selectedResource = resource">
+                <img :src="`/farm-world-space-calculator/img/${resource}.png`" class="icon-resource-select-img">
+                <div class="icon-resource-select-resource">
+                  {{ $t(resource) }}
+                </div>
+              </div>
+            </div>
           </div>
           <div class="form-group">
             <label for="pricePerUnit">{{ $t('pricePerUnit') }}</label>
@@ -57,7 +61,7 @@
     </div>
   </div>
 </template>
-  
+
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -111,7 +115,7 @@ watch(pricesStore.prices, () => {
 }, { deep: true });
 
 const stackPrice = computed(() => {
-  const decrease = 0.001 / 10**onlySignificantDigits.value
+  const decrease = 0.001 / 10 ** onlySignificantDigits.value
   const price = autoPrice.value ? pricesStore.getResourcePrice(selectedResource.value) - decrease : pricePerUnit.value;
   return resourceAmount.value * price;
 });

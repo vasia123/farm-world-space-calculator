@@ -13,6 +13,7 @@ export const useAccountsStore = defineStore('accounts', () => {
       id: Date.now(),
       name: `${$t('myAccount')}${accNum}`,
       tools: [],
+      factories: [],
       editing: false
     };
     accounts.value.push(newAccount);
@@ -38,12 +39,13 @@ export const useAccountsStore = defineStore('accounts', () => {
         });
       });
     } else {
-      const storedTools = localStorage.getItem('userTools');
+      const storedTools = localStorage.getItem('userTools'); // DEPRECATED: импорт из старых версий
       accounts.value = [
         {
           id: 1,
           name: $t('myAccount'),
           tools: storedTools ? JSON.parse(storedTools) : [],
+          factories: [],
           editing: false
         }
       ];

@@ -3,6 +3,7 @@ import { ref } from 'vue';
 
 export const useModalsStore = defineStore('modals', () => {
   const showAddToolModal = ref(false);
+  const showAddFactoryModal = ref(false);
   const showSettingsMenu = ref(false);
   const showChartModal = ref(false);
   const showStackPriceModal = ref(false);
@@ -19,8 +20,24 @@ export const useModalsStore = defineStore('modals', () => {
     document.body.classList.remove('modal-open');
   }
 
+  function openAddFactoryModal(accountId: number) {
+    showAddFactoryModal.value = true;
+    selectedAccountId.value = accountId;
+    document.body.classList.add('modal-open');
+  }
+
+  function closeAddFactoryModal() {
+    showAddFactoryModal.value = false;
+    document.body.classList.remove('modal-open');
+  }
+
   function toggleSettingsMenu() {
     showSettingsMenu.value = !showSettingsMenu.value;
+    if (showSettingsMenu.value) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
   }
 
   function openChartModal() {
@@ -49,6 +66,7 @@ export const useModalsStore = defineStore('modals', () => {
     showChartModal,
     showStackPriceModal,
     selectedAccountId,
+    showAddFactoryModal,
     openAddToolModal,
     closeAddToolModal,
     toggleSettingsMenu,
@@ -56,5 +74,7 @@ export const useModalsStore = defineStore('modals', () => {
     closeChartModal,
     openStackPriceModal,
     closeStackPriceModal,
+    openAddFactoryModal,
+    closeAddFactoryModal,
   };
 });

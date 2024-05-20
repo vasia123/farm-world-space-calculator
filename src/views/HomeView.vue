@@ -20,8 +20,10 @@
 
   <Footer />
   <AddToolModal />
+  <AddFactoryModal />
   <SettingsMenu />
   <PriceChartModal />
+  <NewsModal />
 </template>
 
 <script setup lang="ts">
@@ -35,6 +37,8 @@ import AccountList from '@/components/AccountList.vue';
 import ToolTypeSummary from '@/components/ToolTypeSummary.vue';
 import Footer from '@/components/PageFooter.vue';
 import AddToolModal from '@/components/AddToolModal.vue';
+import AddFactoryModal from '@/components/AddFactoryModal.vue';
+import NewsModal from '@/components/NewsModal.vue';
 import SettingsMenu from '@/components/SettingsMenu.vue';
 import PriceChartModal from '@/components/PriceChartModal.vue';
 import StackPriceCalculator from '@/components/StackPriceCalculator.vue';

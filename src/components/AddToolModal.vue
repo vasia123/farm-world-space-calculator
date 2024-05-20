@@ -11,9 +11,16 @@
         <div class="modal-body">
           <div class="form-group">
             <label for="toolType">{{ $t('chooseToolType') }}</label>
-            <select id="toolType" v-model="selectedTool" class="form-control">
-              <option v-for="tool in tools" :key="tool.name" :value="tool">{{ tool.name }}</option>
-            </select>
+            <div class="icon-resource-select-wrapper icon-resource-select-wrapper--tools">
+              <div v-for="tool in tools" :key="tool.name" class="icon-resource-select-row" :class="{
+                'icon-resource-select-row--active': tool.name === selectedTool.name
+              }" @click="selectedTool = tool">
+                <img :src="tool.icon" class="icon-resource-select-img icon-resource-select-img--big">
+                <div class="icon-resource-select-resource">
+                  {{ $t(tool.name) }}
+                </div>
+              </div>
+            </div>
           </div>
           <div class="form-group">
             <label for="craftPrice">{{ $t('craftPriceFull') }}<i class="ton-icon"></i></label>
@@ -44,13 +51,12 @@ const accountsStore = useAccountsStore();
 
 const showModal = computed(() => modalsStore.showAddToolModal);
 const selectedAccountId = computed(() => modalsStore.selectedAccountId);
-const selectedTool = ref<Tool | null>(null);
 const craftPrice = ref(0);
 
 const tools = computed(() => toolsStore.tools);
+const selectedTool = ref<Tool>(tools.value[0]);
 
 function closeModal() {
-  selectedTool.value = null;
   craftPrice.value = 0;
   modalsStore.closeAddToolModal();
 }

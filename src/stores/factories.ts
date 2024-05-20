@@ -1,30 +1,8 @@
 import { defineStore } from 'pinia';
 import { usePricesStore } from './prices';
-import type { ResourceType, ResourceFactoriesType } from '@/types/main';
+import type { Factories, ResourceFactoriesType } from '@/types/main';
 
 export const useFactoriesStore = defineStore('factories', () => {
-    type FactoryLevelPrice = {
-        [key in ResourceFactoriesType | ResourceType]?: number;
-    };
-
-    type FactoryLevel = {
-        level: number;
-        up_level_price: FactoryLevelPrice;
-        craft_recipe: { [key in ResourceType]?: number };
-        result_craft: number;
-    };
-
-    type FactoriesNames = "sawmill" | "kitchen" | "forge"
-
-    type Factories = {
-        [key in FactoriesNames]: {
-            build_slot_cost: number,
-            resource: ResourceFactoriesType,
-            levels: FactoryLevel[],
-            cooldown: number,
-        };
-    };
-
     const factories: Factories = {
         sawmill: {
             build_slot_cost: 6000,

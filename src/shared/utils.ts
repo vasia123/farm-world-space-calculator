@@ -1,4 +1,4 @@
-export function formatNumber(num: number | string): string {
+export function formatNumber(num: number | string, numSignChars = 2): string {
     const number = Number(num)
     if (Number.isInteger(number)) {
         return String(num);
@@ -15,6 +15,6 @@ export function formatNumber(num: number | string): string {
     if (firstSignificantDigitPos > decimalPos + 8) {
         return numString.substring(0, decimalPos);
     }
-    const decimalPlaces = firstSignificantDigitPos - decimalPos - 1 + 2;
+    const decimalPlaces = firstSignificantDigitPos - decimalPos - 1 + numSignChars;
     return number.toFixed(decimalPlaces);
 }

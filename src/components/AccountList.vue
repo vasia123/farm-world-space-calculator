@@ -20,21 +20,21 @@
               </tr>
               <tr v-for="(tool, index) in account.tools" :key="index" class="tool-row">
                 <td>
-                  <img :src="tool.icon" :alt="tool.name" class="mr-2" width="20px" height="20px">
+                  <img :src="tool.icon" :alt="tool.name" class="mr-2" width="20px">
                 </td>
                 <td>
                   {{ fn(tool.profit * 24) }}
                   <img :src="'/farm-world-space-calculator/img/' + String(tool.resource).toLowerCase() + '.png'"
-                    width="20px" height="20px" class="mb-1" />
+                    width="20px" class="mb-1" />
                 </td>
                 <td>
                   <div v-if="tool.energy > 0" class="tool-costs-row">
                     {{ fn(tool.energy / 5 * 24) }}
-                    <img src="/img/food.png" width="20px" height="20px" class="mb-1" />
+                    <img src="/img/food.png" width="20px" class="mb-1" />
                   </div>
                   <div v-if="tool.durability > 0" class="tool-costs-row">
                     {{ fn(tool.durability / 5 * 24) }}
-                    <img src="/img/gold.png" width="20px" height="20px" class="mb-1" />
+                    <img src="/img/gold.png" width="20px" class="mb-1" />
                   </div>
                 </td>
                 <td>
@@ -44,33 +44,58 @@
                   {{ tool.craftPrice }} <i class="ton-icon"></i>
                 </td>
               </tr>
+              <tr v-for="(factory, index) in account.factories" :key="index" class="tool-row">
+                <td class="factory-cell-img">
+                  <img :src="`/farm-world-space-calculator/img/${factory.name}.jpg`" :alt="factory.name" class="mr-2"
+                    width="20px">
+                  <div class="factory-cell-level mr-2">{{ factory.level.level }}</div>
+                </td>
+                <td>
+                  {{ fn(factory.level.result_craft) }}
+                  <img :src="'/farm-world-space-calculator/img/' + String(factory.data.resource).toLowerCase() + '.png'"
+                    width="20px" class="mb-1" />
+                </td>
+                <td>
+                  <div v-for="(recipe, resource) in factory.level.craft_recipe" :key="resource" class="tool-costs-row">
+                    {{ fn(recipe || 0) }}
+                    <img :src="`/farm-world-space-calculator/img/${resource}.png`" width="20px" class="mb-1" />
+                  </div>
+                </td>
+                <td>
+                  {{ fn(factoriesStore.getFactoryDailyProfit(factory.name, factory.level.level)) }}
+                  <i class="ton-icon"></i>
+                </td>
+                <td>
+                  {{ factory.craftPrice }} <i class="ton-icon"></i>
+                </td>
+              </tr>
               <tr class="tool-row">
                 <td>
                   {{ $t('dailyProfit') }}:
                 </td>
                 <td>
-                  <div v-for="(amount, resource) in summariesStore.getAccountToolsResourceSummary(account.id)"
+                  <div v-for="(amount, resource) in summariesStore.getAccountResourcesSummary(account.id)"
                     :key="resource" class="tool-costs-row">
                     {{ fn(amount) }}
-                    <img :src="'/farm-world-space-calculator/img/' + resource + '.png'" width="20px" height="20px"
-                      class="mb-1" />
+                    <img :src="'/farm-world-space-calculator/img/' + resource + '.png'" width="20px" class="mb-1" />
                   </div>
                 </td>
                 <td>
-                  <div v-for="(amount, resource) in summariesStore.getAccountToolsConsumptionSummary(account.id)"
-                    :key="resource" class="tool-costs-row">
-                    {{ fn(amount) }}
-                    <img :src="'/farm-world-space-calculator/img/' + resource + '.png'" width="20px" height="20px"
-                      class="mb-1" />
-                  </div>
+                  <template v-for="(amount, resource) in summariesStore.getAccountConsumptionSummary(account.id)"
+                    :key="resource">
+                    <div v-if="amount > 0" class="tool-costs-row">
+                      {{ fn(amount) }}
+                      <img :src="'/farm-world-space-calculator/img/' + resource + '.png'" width="20px" class="mb-1" />
+                    </div>
+                  </template>
                 </td>
                 <td>
-                  {{ fn(summariesStore.getAccountToolsProfitSummary(account.id)) }} <i class="ton-icon"></i>
+                  {{ fn(summariesStore.getAccountProfitSummary(account.id)) }} <i class="ton-icon"></i>
                 </td>
                 <td>
                   {{ $t('roi') }}: <span class="badge grey darken-2 sm ml-1">{{
-      summariesStore.getUserToolsROI(account.id).toFixed(1)
-    }}</span>
+                    summariesStore.getAccountROI(account.id).toFixed(1)
+                    }}</span>
                   {{ $t('days') }}
                 </td>
               </tr>
@@ -91,13 +116,13 @@
                 </tr>
                 <tr v-for="buff in buffsStore.buffs" :key="buff.name" class="tool-row">
                   <td class="text-left pl-2">
-                    <img :src="'/farm-world-space-calculator/img/' + buff.name + '.png'" width="20px" height="20px" class="mb-1" />
+                    <img :src="'/farm-world-space-calculator/img/' + buff.name + '.png'" width="20px" class="mb-1" />
                     {{ $t(buff.name) }}
                   </td>
                   <td>
                     <div v-for="(amount, resource) in buff.cost" :key="resource" class="tool-costs-row">
                       {{ amount }}
-                      <img :src="'/farm-world-space-calculator/img/' + resource + '.png'" width="20px" height="20px" class="mb-1" />
+                      <img :src="'/farm-world-space-calculator/img/' + resource + '.png'" width="20px" class="mb-1" />
                     </div>
                   </td>
                   <td>
@@ -125,12 +150,12 @@
             <table class="tools-table">
               <tr class="tool-row">
                 <td>
-                  {{ fn(summariesStore.getAllToolsProfitSummary()) }} <i class="ton-icon"></i>
+                  {{ fn(summariesStore.getAllProfitSummary()) }} <i class="ton-icon"></i>
                 </td>
                 <td>
                   {{ $t('roi') }}:
                   <span class="badge grey darken-2 sm ml-1">
-                    {{ summariesStore.getAllToolsROI().toFixed(1) }}
+                    {{ summariesStore.getFullAccountROI().toFixed(1) }}
                   </span>
                   {{ $t('days') }}
                 </td>
@@ -148,15 +173,17 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useAccountsStore } from '@/stores/accounts';
 import { useSummariesStore } from '@/stores/summaries';
-import { useBuffsStore } from '@/stores/buffs';
+// import { useBuffsStore } from '@/stores/buffs';
 import { useToolsStore } from '@/stores/tools';
 import { formatNumber } from '@/shared/utils';
+import { useFactoriesStore } from '@/stores/factories';
 
 const { t: $t } = useI18n();
 const accountsStore = useAccountsStore();
 const summariesStore = useSummariesStore();
 const toolsStore = useToolsStore();
-const buffsStore = useBuffsStore();
+const factoriesStore = useFactoriesStore();
+// const buffsStore = useBuffsStore();
 const fn = formatNumber;
 const accounts = computed(() => accountsStore.accounts);
 </script>
