@@ -33,7 +33,7 @@ export const useToolsStore = defineStore('tools', () => {
   }
 
   function getToolEnergyCost(tool: Tool): number {
-    return tool.energy / 5 * pricesStore.prices.food;
+    return tool.energy / 3 * pricesStore.prices.food;
   }
 
   function getToolDurabilityCost(tool: Tool): number {
