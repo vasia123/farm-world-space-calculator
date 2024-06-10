@@ -115,7 +115,7 @@ watch(pricesStore.prices, () => {
 }, { deep: true });
 
 const stackPrice = computed(() => {
-  const decrease = 0.001 / 10 ** onlySignificantDigits.value
+  const decrease = 0.0001 / 10 ** onlySignificantDigits.value
   const price = autoPrice.value ? pricesStore.getResourcePrice(selectedResource.value) - decrease : pricePerUnit.value;
   return resourceAmount.value * price;
 });
@@ -132,7 +132,7 @@ function closeModal() {
 
 async function copyStackPrice() {
   try {
-    const countNumbers = onlySignificantDigits.value + 3
+    const countNumbers = onlySignificantDigits.value + 4
     await navigator.clipboard.writeText(stackPrice.value.toFixed(countNumbers).toString());
     // Опционально: показать сообщение об успешном копировании
   } catch (error) {
