@@ -6,7 +6,7 @@
           <div class="text-center my-2 font-weight-bolder">
             {{ account.name }}
           </div>
-          <div class="no-tools" v-if="account.tools.length == 0">
+          <div class="no-tools" v-if="account.tools.length == 0 && account.factories.length === 0">
             {{ $t('noToolsAdded') }}<br>{{ $t('addToolsInSettings') }}
           </div>
           <div v-else class="tools-tables mb-2">
@@ -74,17 +74,19 @@
                   {{ $t('dailyProfit') }}:
                 </td>
                 <td>
-                  <div v-for="(amount, resource) in summariesStore.getAccountResourcesSummary(account.id)"
-                    :key="resource" class="tool-costs-row">
-                    {{ fn(amount) }}
-                    <img :src="'/farm-world-space-calculator/img/' + resource + '.png'" width="20px" class="mb-1" />
-                  </div>
+                  <template v-for="(amount, resource) in summariesStore.getAccountResourcesSummary(account.id)"
+                    :key="resource">
+                    <div v-if="amount > 0" class="tool-costs-row">
+                      {{ fn(amount) }}
+                      <img :src="'/farm-world-space-calculator/img/' + resource + '.png'" width="20px" class="mb-1" />
+                    </div>
+                  </template>
                 </td>
                 <td>
                   <template v-for="(amount, resource) in summariesStore.getAccountConsumptionSummary(account.id)"
                     :key="resource">
                     <div v-if="amount > 0" class="tool-costs-row">
-                      {{ fn(amount) }}
+                      -{{ fn(amount) }}
                       <img :src="'/farm-world-space-calculator/img/' + resource + '.png'" width="20px" class="mb-1" />
                     </div>
                   </template>
@@ -95,7 +97,7 @@
                 <td>
                   {{ $t('roi') }}: <span class="badge grey darken-2 sm ml-1">{{
                     summariesStore.getAccountROI(account.id).toFixed(1)
-                    }}</span>
+                  }}</span>
                   {{ $t('days') }}
                 </td>
               </tr>

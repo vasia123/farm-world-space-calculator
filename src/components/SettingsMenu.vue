@@ -46,7 +46,7 @@
                 </div>
               </div>
               <div class="account-tools">
-                <div v-if="account.tools.length === 0" class="no-tools">
+                <div v-if="account.tools.length === 0 && account.factories.length === 0" class="no-tools">
                   {{ $t('noToolsAdded') }}
                 </div>
                 <ul v-else class="tools-list">
@@ -65,7 +65,7 @@
                       {{ factory.name }}
                       <!-- - {{ tool.craftPrice }}<i class="ton-icon"></i>-->
                     </span>
-                    <button @click="accountsStore.removeUserTool(account.id, index)" class="remove-tool-button">
+                    <button @click="accountsStore.removeUserFactory(account.id, index)" class="remove-tool-button">
                       <TrashIcon />
                     </button>
                   </li>

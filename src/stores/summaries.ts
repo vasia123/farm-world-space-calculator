@@ -13,7 +13,7 @@ export const useSummariesStore = defineStore('summaries', () => {
   const pricesStore = usePricesStore();
   const factoriesStore = useFactoriesStore();
 
-  function getAccountResourcesSummary(accountId: number): Record<string, number> {
+  function getAccountRawResourcesSummary(accountId: number): Record<string, number> {
     const account = accountsStore.accounts.find(acc => acc.id === accountId);
     if (!account) return {};
 
@@ -42,6 +42,24 @@ export const useSummariesStore = defineStore('summaries', () => {
     });
     return resourceSummary;
   }
+  function getAccountResourcesSummary(accountId: number): Record<string, number> {
+    const profitSummary = getAccountRawResourcesSummary(accountId)
+    const consumptionSummary = getAccountRawConsumptionSummary(accountId)
+    if (profitSummary.wood) {
+      profitSummary.wood -= consumptionSummary.wood;
+      if (profitSummary.wood < 0) profitSummary.wood = 0;
+    }
+    if (profitSummary.food) {
+      profitSummary.food -= consumptionSummary.food;
+      if (profitSummary.food < 0) profitSummary.food = 0;
+    }
+    if (profitSummary.gold) {
+      profitSummary.gold -= consumptionSummary.gold;
+      if (profitSummary.gold < 0) profitSummary.gold = 0;
+    }
+
+    return profitSummary;
+  }
 
   function getAccountProfitSummary(accountId: number): number {
     const account = accountsStore.accounts.find(acc => acc.id === accountId);
@@ -55,7 +73,7 @@ export const useSummariesStore = defineStore('summaries', () => {
     return toolsDailyProfit + factoriesDailyProfit;
   }
 
-  function getAccountConsumptionSummary(accountId: number): { [key in ResourceType]: number } {
+  function getAccountRawConsumptionSummary(accountId: number): { [key in ResourceType]: number } {
     const consumptionSummary: { [key in ResourceType]: number } = {
       food: 0,
       gold: 0,
@@ -75,6 +93,24 @@ export const useSummariesStore = defineStore('summaries', () => {
         consumptionSummary[resource as ResourceType] += factory.level.craft_recipe[resource as ResourceType] || 0
       }
     });
+
+    return consumptionSummary;
+  }
+  function getAccountConsumptionSummary(accountId: number): { [key in ResourceType]: number } {
+    const consumptionSummary = getAccountRawConsumptionSummary(accountId)
+    const profitSummary = getAccountRawResourcesSummary(accountId)
+    if (profitSummary.wood) {
+      consumptionSummary.wood -= profitSummary.wood;
+      if (consumptionSummary.wood < 0) consumptionSummary.wood = 0;
+    }
+    if (profitSummary.food) {
+      consumptionSummary.food -= profitSummary.food;
+      if (consumptionSummary.food < 0) consumptionSummary.food = 0;
+    }
+    if (profitSummary.gold) {
+      consumptionSummary.gold -= profitSummary.gold;
+      if (consumptionSummary.gold < 0) consumptionSummary.gold = 0;
+    }
 
     return consumptionSummary;
   }
