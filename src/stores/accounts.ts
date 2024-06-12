@@ -62,37 +62,42 @@ export const useAccountsStore = defineStore('accounts', () => {
   function loadAccounts() {
     const storedAccounts = localStorage.getItem('accounts');
     if (storedAccounts) {
-      const rawAccounts: StoredAccount[] | undefined = JSON.parse(storedAccounts);
-      if (rawAccounts) {
-        accounts.value = [];
-        rawAccounts.forEach(account => {
-          const toolsRaw: Array<CraftedTool | undefined> = account.tools?.map(accountTool => {
-            const toolFound = toolsStore.tools.find(tool => tool.name === accountTool.name)
-            if (!toolFound) return undefined
-            return {
-              ...toolFound,
-              craftPrice: accountTool.craftPrice,
-            };
-          }) || [];
-          const factoriesRaw: Array<CraftedFactory | undefined> = account.factories?.map(accountFactory => {
-            const factory = factoriesStore.factories[accountFactory.type]
-            const levelFound = factory.levels.find(factory => factory.level === accountFactory.level)
-            if (!levelFound) return undefined
-            return {
-              name: accountFactory.type,
-              level: levelFound,
-              data: factory,
-              craftPrice: accountFactory.craftPrice,
-            };
-          }) || [];
-          accounts.value.push({
-            id: account.id,
-            name: account.name,
-            tools: toolsRaw.filter(tool => tool !== undefined) as CraftedTool[],
-            factories: factoriesRaw.filter(factory => factory !== undefined) as CraftedFactory[],
-            editing: false,
-          })
-        });
+      try {
+        const rawAccounts: StoredAccount[] | undefined = JSON.parse(storedAccounts);
+        if (rawAccounts) {
+          accounts.value = [];
+          rawAccounts.forEach(account => {
+            const toolsRaw: Array<CraftedTool | undefined> = account.tools?.map(accountTool => {
+              const toolFound = toolsStore.tools.find(tool => tool.name === accountTool.name)
+              if (!toolFound) return undefined
+              return {
+                ...toolFound,
+                craftPrice: accountTool.craftPrice,
+              };
+            }) || [];
+            const factoriesRaw: Array<CraftedFactory | undefined> = account.factories?.map(accountFactory => {
+              const factory = factoriesStore.factories[accountFactory.type]
+              const levelFound = factory.levels.find(factory => factory.level === accountFactory.level)
+              if (!levelFound) return undefined
+              return {
+                name: accountFactory.type,
+                level: levelFound,
+                data: factory,
+                craftPrice: accountFactory.craftPrice,
+              };
+            }) || [];
+            accounts.value.push({
+              id: account.id,
+              name: account.name,
+              tools: toolsRaw.filter(tool => tool !== undefined) as CraftedTool[],
+              factories: factoriesRaw.filter(factory => factory !== undefined) as CraftedFactory[],
+              editing: false,
+            })
+          });
+        }
+      } catch (error) {
+        addAccount();
+        saveAccounts();
       }
     } else {
       addAccount();
