@@ -1,6 +1,7 @@
 <template>
   <div class="page-outer">
     <Navbar />
+    <ProjectsLinks />
 
     <h1 class="title">
       {{ $t('title') }}
@@ -42,6 +43,7 @@ import NewsModal from '@/components/NewsModal.vue';
 import SettingsMenu from '@/components/SettingsMenu.vue';
 import PriceChartModal from '@/components/PriceChartModal.vue';
 import StackPriceCalculator from '@/components/StackPriceCalculator.vue';
+import ProjectsLinks from '@/components/ProjectsLinks.vue';
 
 const { t: $t } = useI18n();
 const accountsStore = useAccountsStore();
