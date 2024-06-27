@@ -9,9 +9,9 @@ export const useToolsStore = defineStore('tools', () => {
     { name: 'Axe (Uncommon)', icon: 'img/axe_uncommon.png', profit: 17, wood: 7200, gold: 1200, cooldown: 1, resource: 'wood', energy: 30, durability: 15, maxDurability: 300 },
     { name: 'Axe (Rare)', icon: 'img/axe_rare.png', profit: 54, wood: 21600, gold: 3600, cooldown: 1, resource: 'wood', energy: 60, durability: 45, maxDurability: 900 },
     { name: 'Axe (Promo)', icon: 'img/axe_promo.png', profit: 1, wood: 110, gold: 20, cooldown: 1, resource: 'wood', energy: 4, durability: 1, maxDurability: 25 },
-    { name: 'Bow (Common)', icon: 'img/bow_common.png', profit: 5, wood: 1200, gold: 200, cooldown: 1, resource: 'food', energy: 0, durability: 5, maxDurability: 250 },
-    { name: 'Bow (Uncommon)', icon: 'img/bow_uncommon.png', profit: 20, wood: 4800, gold: 800, cooldown: 1, resource: 'food', energy: 0, durability: 20, maxDurability: 1000 },
-    { name: 'Bow (Rare)', icon: 'img/bow_rare.png', profit: 80, wood: 19200, gold: 3200, cooldown: 1, resource: 'food', energy: 0, durability: 32, maxDurability: 1600 },
+    { name: 'Bow (Common)', icon: 'img/bow_common.png', profit: 5, wood: 1200, gold: 200, cooldown: 1, resource: 'food', energy: 5, durability: 5, maxDurability: 250 },
+    { name: 'Bow (Uncommon)', icon: 'img/bow_uncommon.png', profit: 20, wood: 4800, gold: 800, cooldown: 1, resource: 'food', energy: 20, durability: 20, maxDurability: 1000 },
+    { name: 'Bow (Rare)', icon: 'img/bow_rare.png', profit: 80, wood: 19200, gold: 3200, cooldown: 1, resource: 'food', energy: 32, durability: 32, maxDurability: 1600 },
     { name: 'Pickaxe (Common)', icon: 'img/pikaxe_common.png', profit: 50, wood: 24000, gold: 4000, cooldown: 1, resource: 'gold', energy: 66, durability: 30, maxDurability: 500 }
   ];
   const types: Record<ResourceType, Tool[]> = {
