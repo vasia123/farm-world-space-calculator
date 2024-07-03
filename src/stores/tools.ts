@@ -3,7 +3,7 @@ import type { Tool, ResourceType } from '@/types/main';
 import { usePricesStore } from './prices';
 
 export const useToolsStore = defineStore('tools', () => {
-  const energyMultiplyer = 2;
+  const energyMultiplyer = 1 / 2;
   const tools: Tool[] = [
     { name: 'Axe (Common)', icon: 'img/axe_common.png', profit: 5, wood: 2400, gold: 400, cooldown: 1, resource: 'wood', energy: 10, durability: 5, maxDurability: 100 },
     { name: 'Axe (Uncommon)', icon: 'img/axe_uncommon.png', profit: 17, wood: 7200, gold: 1200, cooldown: 1, resource: 'wood', energy: 30, durability: 15, maxDurability: 300 },
